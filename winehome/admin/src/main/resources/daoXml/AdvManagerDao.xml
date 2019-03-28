@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.admin.dao.AdvManagerDao">
+    <insert id="addAdvertising" useGeneratedKeys="true" keyProperty="id">
+        insert into mall_ad
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name!=null">
+                name ,
+            </if>
+            <if test="logo!=null">
+                logo ,
+            </if>
+            <if test="backImg!=null">
+                backImg ,
+            </if>
+            <if test="sort!=null">
+                sort ,
+            </if>
+            <if test="createTime!=null">
+                createtime ,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name!=null">
+                #{name} ,
+            </if>
+            <if test="logo!=null">
+                #{logo} ,
+            </if>
+            <if test="backImg!=null">
+                #{backImg} ,
+            </if>
+            <if test="sort!=null">
+                #{sort} ,
+            </if>
+            <if test="createTime!=null">
+                #{createTime} ,
+            </if>
+        </trim>
+    </insert>
+
+    <delete id="deleteAdvertising" parameterType="java.lang.Long">
+      delete from mall_ad
+      where id = #{advertisingId}
+    </delete>
+
+
+    <update id="updateAdvertising"
+            parameterType="com.bgd.admin.entity.AdvManagerDto">
+        update mall_ad
+        <set>
+            <if test="name!=null">
+                name =#{name} ,
+            </if>
+            <if test="logo!=null">
+                logo =#{logo} ,
+            </if>
+            <if test="backImg!=null">
+                backImg =#{backImg} ,
+            </if>
+            <if test="sort!=null">
+                sort =#{sort} ,
+            </if>
+            <if test="updateTime!=null">
+                updateTime =#{updateTime} ,
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="countAdvertising" resultType="java.lang.Long">
+        select count(a.id)
+        from mall_ad a
+        where 1=1
+        <if test="name !=null">
+            and a.name like concat('%',#{name},'%')
+        </if>
+    </select>
+
+    <select id="findAdvertising" resultType="com.bgd.admin.entity.AdvManagerDto">
+        select a.id,a.name,a.logo,a.backImg,a.sort
+        from mall_ad a
+        where 1=1
+        <if test="name !=null">
+            and a.name like concat('%',#{name},'%')
+        </if>
+        limit #{pageNo},#{pageSize}
+    </select>
+
+</mapper>

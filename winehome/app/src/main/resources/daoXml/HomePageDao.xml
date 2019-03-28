@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.app.dao.HomePageDao">
+
+
+    <select id="queryAdvPositionList" resultType="com.bgd.app.entity.MallAdDto">
+        SELECT id,`name`,logo,backimg,sort
+        FROM mall_ad
+        ORDER BY sort DESC
+    </select>
+
+    <select id="queryAdvPosProductList" resultType="com.bgd.app.entity.MallAdProductDto">
+        SELECT i.id as productId,i.`name` as productName,i.logo as productLogo,p.newcapacity
+        FROM mall_ad_product p
+        JOIN product_information i ON p.productid = i.id
+        WHERE p.adid = #{0}
+        ORDER BY p.createtime DESC
+    </select>
+
+    <select id="queryHotSellingCountry" resultType="com.bgd.app.entity.MallCountryDto">
+        SELECT b.id,b.`name`,b.logo,b.phrase,b.remark
+        FROM mall_push a
+        LEFT JOIN mall_country b ON a.pushid = b.id
+        WHERE a.type = '1'
+        ORDER BY a.createtime DESC
+        limit 8
+    </select>
+
+    <select id="queryRecommendChateau" resultType="com.bgd.app.entity.MallChateauDto">
+        SELECT b.id AS chateauId,b.`name` AS categoryName,b.logo AS chateauLogo,
+		b.categoryid AS categoryId,c.`name` AS countryName,COUNT(t.chateauid) AS focusNum
+        FROM mall_push a
+        JOIN mall_chateau b ON a.pushid = b.id
+		JOIN mall_country c ON b.countryid = c.id
+		LEFT JOIN vip_focus t ON a.pushid = t.chateauid
+		WHERE a.type = '2'
+		LIMIT 1
+    </select>
+
+    <select id="queryChateauProductList" resultType="com.bgd.support.entity.ProductInformationPo">
+        SELECT b.id,b.`name`,b.logo,b.capacity,b.remark
+        FROM mall_chateau a
+        JOIN product_information b ON a.id= b.chateauid
+        WHERE a.id = #{0}
+        ORDER BY b.createtime DESC
+        LIMIT 4
+    </select>
+
+    <select id="queryRecommendPro" resultType="com.bgd.app.entity.RecommendProDto">
+        SELECT DISTINCT b.id,b.`name`,b.logo,b.capacity,b.remark,
+        c.`name` AS countryName,d.`name` AS categoryName
+        FROM mall_push a
+        JOIN product_information b ON a.pushid = b.id
+        JOIN mall_country c ON b.countryid = c.id
+        JOIN product_category d ON b.categoryid = d.id
+        WHERE a.type ='3'
+        limit 1
+    </select>
+
+    <select id="queryChoiceAct" resultType="com.bgd.app.entity.ChoiceActDto">
+        SELECT b.id AS actId,b.img AS actImg
+        FROM mall_push a
+        JOIN mall_activity b ON a.pushid = b.id
+        WHERE a.type = '4'
+        limit 1
+    </select>
+
+    <select id="queryProRanking" resultType="com.bgd.app.entity.ProRankingDto">
+        SELECT DISTINCT a.productid AS productId,a.categoryid AS categoryId,
+        a.count,b.`name` AS productName,b.logo,b.capacity
+        FROM product_information b
+        LEFT JOIN mall_sale_day a ON a.productid = b.id
+        WHERE 1=1
+        order by a.count desc
+        limit 1
+    </select>
+
+    <select id="queryFirstNewPro" resultType="com.bgd.app.entity.FirstNewProDto">
+        SELECT a.productid AS productId,a.categoryid AS categoryId,
+        b.`name` AS productName,b.logo,a.newcapacity,a.activityid as  actId
+        FROM mall_activity_product a
+        left JOIN product_information b ON a.productid = b.id
+        JOIN mall_activity c ON a.activityid = c.id
+        WHERE 1=1 and c.type='3'
+        ORDER BY a.createtime DESC
+        limit 1
+    </select>
+</mapper>

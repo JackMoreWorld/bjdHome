@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.admin.dao.OrderManagerDao">
+
+    <select id="countOrder" resultType="java.lang.Long">
+        select count(id) from mall_order
+        where 1=1
+        <if test="orderNo != null">
+            and a.orderNo like concat('%',#{orderNo},'%')
+        </if>
+        <if test="logisticsNo != null">
+            and a.logisticsNo like concat('%',#{logisticsNo},'%')
+        </if>
+        <if test="name != null">
+            and b.name like concat('%',#{name},'%')
+        </if>
+        <if test="phone != null">
+            and b.phone like concat('%',#{phone},'%')
+        </if>
+    </select>
+
+    <select id="findOrder" resultType="com.bgd.admin.entity.OrderManagerDto">
+        select a.id,a.orderNo,a.paytype,a.deliverytype,a.logisticsNo,b.name,b.phone
+        from mall_order a
+        left join vip_information b on a.vipid = b.id
+        where 1=1
+        <if test="orderNo != null">
+            and a.orderNo like concat('%',#{orderNo},'%')
+        </if>
+        <if test="logisticsNo != null">
+            and a.logisticsNo like concat('%',#{logisticsNo},'%')
+        </if>
+        <if test="name != null">
+            and b.name like concat('%',#{name},'%')
+        </if>
+        <if test="phone != null">
+            and b.phone like concat('%',#{phone},'%')
+        </if>
+        limit #{pageNo},#{pageSize}
+    </select>
+
+    <select id="findOneOrder" resultType="com.bgd.admin.entity.OrderManagerDto">
+        select a.id,a.orderNo,a.paytype,a.price,b.name,b.phone,a.linkman,a.linkphone,a.linkaddress,
+        a.deliverytype,a.logisticsNo,a.freight,a.discountprice
+        from mall_order a
+        left join vip_information b on a.vipid = b.id
+        where a.id = #{orderId}
+        limit 1
+    </select>
+
+</mapper>

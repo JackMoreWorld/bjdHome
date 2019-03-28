@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.admin.dao.OrderDetManagerDao">
+
+    <select id="findOneOrderStatus" resultType="java.util.Map">
+        select mod.status detailStatus, mor.status refundStatus from mall_order_detail mod
+        inner join mall_order_refund mor on mod.id = mor.detailid
+        where mod.id = #{id}
+    </select>
+
+    <update id="updateOrderDetail" parameterType="java.lang.Long">
+        update mall_order_detail
+        set status = #{status}
+        where id = #{id}
+    </update>
+
+    <update id="updateOrderRefund" parameterType="java.lang.Long">
+        update mall_order_refund
+        set status = #{status}
+        where id = #{refundId}
+    </update>
+
+    <select id="countOrderDet" resultType="java.lang.Long">
+        select count(mod.id)
+        from mall_order_detail mod
+        inner join mall_order_refund mor on mor.detailid = mod.id
+        left join mall_order mo on mo.id = mod.orderid
+        left join vip_information vi on vi.id = mod.vipid
+        left join product_information pi on pi.id = mod.productid
+        where 1=1
+        and mod.status = 3 and mor.status = 0
+        <if test="refundNo != null">
+            and mor.refundNo like concat ('%',#{refundNo},'%')
+        </if>
+        <if test="orderNo != null">
+            and mo.orderNo like concat ('%',#{orderNo},'%')
+        </if>
+        <if test="vipName!= null">
+            and vi.name like concat ('%',#{vipName},'%')
+        </if>
+        <if test="productName != null">
+            and pi.name like concat ('%',#{productName},'%')
+        </if>
+    </select>
+
+    <select id="findOrderDet" resultType="com.bgd.admin.entity.OrderDetManagerDto">
+        select mod.id,mod.vipid,vi.name vipName,mod.orderid,mo.orderNo,mod.productid,pi.name productName,
+        mod.capacity,mod.status,mod.count,mod.totalprice,mor.refundNo
+        from mall_order_detail mod
+        inner join mall_order_refund mor on mor.detailid = mod.id
+        left join mall_order mo on mo.id = mod.orderid
+        left join vip_information vi on vi.id = mod.vipid
+        left join product_information pi on pi.id = mod.productid
+        where 1=1
+        and mod.status = 3 and mor.status = 0
+        <if test="refundNo != null">
+            and mor.refundNo like concat ('%',#{refundNo},'%')
+        </if>
+        <if test="orderNo != null">
+            and mo.orderNo like concat ('%',#{orderNo},'%')
+        </if>
+        <if test="vipName!= null">
+            and vi.name like concat ('%',#{vipName},'%')
+        </if>
+        <if test="productName != null">
+            and pi.name like concat ('%',#{productName},'%')
+        </if>
+    </select>
+
+</mapper>

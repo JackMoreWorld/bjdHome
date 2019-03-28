@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.admin.dao.BannerMangerDao">
+
+    <insert id="addBanner" useGeneratedKeys="true" keyProperty="id">
+        insert into mall_banner
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="img!=null">
+                img ,
+            </if>
+            <if test="adId!=null">
+                adId ,
+            </if>
+            <if test="sort!=null">
+                sort ,
+            </if>
+            <if test="createTime!=null">
+                createtime ,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="img!=null">
+                #{img} ,
+            </if>
+            <if test="adId!=null">
+                #{adId} ,
+            </if>
+            <if test="sort!=null">
+                #{sort} ,
+            </if>
+            <if test="createTime!=null">
+                #{createTime} ,
+            </if>
+        </trim>
+    </insert>
+
+    <delete id="deleteBanner" parameterType="java.lang.Long">
+      delete from mall_banner
+      where id = #{bannerId}
+    </delete>
+
+
+    <update id="updateBanner"
+            parameterType="com.bgd.admin.entity.BannerManagerDto">
+        update mall_banner
+        <set>
+            <if test="img!=null">
+                img =#{img} ,
+            </if>
+            <if test="adId!=null">
+                adId =#{adId} ,
+            </if>
+            <if test="sort!=null">
+                sort =#{sort} ,
+            </if>
+            <if test="updateTime!=null">
+                updatetime =#{updateTime} ,
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="countBanner" resultType="java.lang.Long">
+        select count(a.id)
+        from mall_banner a
+        left join mall_ad b on a.adid = b.id
+        where 1=1
+        <if test="advertisingName !=null">
+            and b.name like concat('%',#{advertisingName},'%')
+        </if>
+    </select>
+
+    <select id="findBanner" resultType="com.bgd.admin.entity.BannerManagerDto">
+        select a.id,a.img,a.adId,a,sort,b.name advertisingName
+        from mall_banner a
+        left join mall_ad b on a.adid = b.id
+        where 1=1
+        <if test="advertisingName !=null">
+            and b.name like concat('%',#{advertisingName},'%')
+        </if>
+        limit #{pageNo},#{pageSize}
+    </select>
+
+</mapper>

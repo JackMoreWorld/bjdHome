@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.app.dao.AddrDao">
+
+
+    <select id="findVipAddrList" parameterType="java.lang.Long" resultType="com.bgd.support.entity.VipAddrPo">
+        select id,vipid,name,phone,addr,type ,province,city,area from vip_addr
+        where vipid=#{vipId} and datastatus =1
+    </select>
+
+    <update id="setDefaultAddr">
+        update vip_addr
+        set type = 1
+        where
+            id = #{1};
+            update vip_addr
+        set type = 2
+        where
+            vipid = #{0}
+        and id != #{1}
+     </update>
+
+    <update id="delAddr">
+           update vip_addr
+        set datastatus = 0
+        where  vipid = #{0}
+        and id = #{1}
+    </update>
+
+
+    <insert id="saveVipAddr"
+            parameterType="com.bgd.support.entity.VipAddrPo" useGeneratedKeys="true" keyProperty="id">
+        insert into vip_addr
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="vipId!=null">
+                vipid ,
+            </if>
+            <if test="name !=null">
+                name ,
+            </if>
+            <if test="phone !=null">
+                phone  ,
+            </if>
+            <if test="type!=null">
+                type,
+            </if>
+            <if test="province!=null">
+                province ,
+            </if>
+            <if test="city!=null">
+                city  ,
+            </if>
+            <if test="area!=null">
+                area ,
+            </if>
+            <if test="addr!=null">
+                addr ,
+            </if>
+            <if test="tag!=null">
+                tag ,
+            </if>
+            <if test="createTime!=null">
+                createtime ,
+            </if>
+            <if test="updateTime!=null">
+                updatetime ,
+            </if>
+            <if test="dataStatus!=null">
+                datastatus ,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="vipId!=null">
+                #{vipId},
+            </if>
+            <if test="name !=null">
+               #{name},
+            </if>
+            <if test="phone !=null">
+                #{phone} ,
+            </if>
+            <if test="type!=null">
+                #{type},
+            </if>
+            <if test="province!=null">
+                #{province},
+            </if>
+            <if test="city!=null">
+                #{city} ,
+            </if>
+            <if test="area!=null">
+                #{area},
+            </if>
+            <if test="addr!=null">
+                #{addr},
+            </if>
+            <if test="tag!=null">
+                #{tag},
+            </if>
+            <if test="createTime!=null">
+                #{createTime},
+            </if>
+            <if test="updateTime!=null">
+                #{updateTime},
+            </if>
+            <if test="dataStatus!=null">
+                #{dataStatus},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="flushVipAddr"
+            parameterType="com.bgd.support.entity.VipAddrPo">
+        update vip_addr
+        <set>
+            <if test="vipId!=null">
+                vipid =#{vipId},
+            </if>
+            <if test="name !=null">
+                name =#{name},
+            </if>
+            <if test="phone !=null">
+                phone =#{phone} ,
+            </if>
+            <if test="type!=null">
+                type =#{type},
+            </if>
+            <if test="province!=null">
+                province =#{province},
+            </if>
+            <if test="city!=null">
+                city =#{city} ,
+            </if>
+            <if test="area!=null">
+                area =#{area},
+            </if>
+            <if test="addr!=null">
+                addr =#{addr},
+            </if>
+            <if test="tag!=null">
+                tag =#{tag},
+            </if>
+            <if test="createTime!=null">
+                createtime =#{createTime},
+            </if>
+            <if test="updateTime!=null">
+                updatetime =#{updateTime},
+            </if>
+            <if test="dataStatus!=null">
+                datastatus =#{dataStatus},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+
+    <select id="getVipDefaultAddr" resultType="com.bgd.support.entity.VipAddrPo">
+        select id,vipid,name,phone,addr,type from vip_addr
+        where vipid= #{vipId} and type = 1
+    </select>
+
+    <select id="getVipFirstAddr" resultType="com.bgd.support.entity.VipAddrPo">
+        select id,vipid,name,phone,addr,type from vip_addr
+        where vipid= #{vipId}
+        ORDER BY createtime ASC
+    </select>
+</mapper>

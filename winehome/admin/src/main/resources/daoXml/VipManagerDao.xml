@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.admin.dao.VipManagerDao">
+
+    <select id="countVip" resultType="java.lang.Long">
+        select count(id)
+        from vip_information a
+        left join vip_mallinfo b on a.id = b.vipid
+        left join vip_level c on c.id = b.levelId
+        where 1=1
+        <if test="name != null">
+            and a.name like concat('%',#{name},'%')
+        </if>
+        <if test="phone != null">
+            and a.phone like concat('%',#{phone},'%')
+        </if>
+        <if test="levelName != null">
+            and c.name like concat('%',#{levelName},'%')
+        </if>
+    </select>
+
+    <select id="findVip" resultType="com.bgd.admin.entity.VipManagerDto">
+        select a.name,a.phone,b.points,b.levelId,c.name levelName
+        from vip_information a
+        left join vip_mallinfo b on a.id = b.vipid
+        left join vip_level c on c.id = b.levelId
+        <if test="name != null">
+            and a.name like concat('%',#{name},'%')
+        </if>
+        <if test="phone != null">
+            and a.phone like concat('%',#{phone},'%')
+        </if>
+        <if test="levelName != null">
+            and c.name like concat('%',#{levelName},'%')
+        </if>
+        limit #{pageNo},#{pageSize}
+    </select>
+
+</mapper>

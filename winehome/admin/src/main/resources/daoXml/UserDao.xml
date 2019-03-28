@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.admin.dao.UserDao">
+<select id="findUserByNameAndPassword" parameterType="com.bgd.admin.entity.SysUser" resultType="com.bgd.admin.entity.SysUser">
+  select id,name,password,status from sys_user limit 1;
+
+</select>
+   
+
+</mapper>

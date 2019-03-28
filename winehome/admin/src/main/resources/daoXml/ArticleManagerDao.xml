@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.admin.dao.ArticleManagerDao">
+
+    <insert id="addArticle" useGeneratedKeys="true" keyProperty="id">
+        insert into community_article
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="no!=null">
+                no ,
+            </if>
+            <if test="vipId!=null">
+                vipId ,
+            </if>
+            <if test="title!=null">
+                title ,
+            </if>
+            <if test="content!=null">
+                content ,
+            </if>
+            <if test="img1!=null">
+                img1 ,
+            </if>
+            <if test="img2!=null">
+                img2 ,
+            </if>
+            <if test="img3!=null">
+                img3 ,
+            </if>
+            <if test="no!=null">
+                img4 ,
+            </if>
+            <if test="img5!=null">
+                img5 ,
+            </if>
+            <if test="type!=null">
+                type ,
+            </if>
+            <if test="createTime!=null">
+                createtime ,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="no!=null">
+                #{no} ,
+            </if>
+            <if test="vipId!=null">
+                #{vipId} ,
+            </if>
+            <if test="title!=null">
+                #{title} ,
+            </if>
+            <if test="content!=null">
+                #{content} ,
+            </if>
+            <if test="img1!=null">
+                #{img1} ,
+            </if>
+            <if test="img2!=null">
+                #{img2} ,
+            </if>
+            <if test="img3!=null">
+                #{img3} ,
+            </if>
+            <if test="img4!=null">
+                #{img4} ,
+            </if>
+            <if test="img5!=null">
+                #{img5} ,
+            </if>
+            <if test="type!=null">
+                #{type} ,
+            </if>
+            <if test="createTime!=null">
+                #{createTime} ,
+            </if>
+        </trim>
+    </insert>
+
+    <delete id="deleteArticle" parameterType="java.lang.Long">
+      delete from community_article
+      where id = #{articleId}
+    </delete>
+
+
+    <update id="updateArticle">
+        update community_article
+        <set>
+            <if test="vipId!=null">
+                vipId =#{vipId} ,
+            </if>
+            <if test="title!=null">
+                title =#{title} ,
+            </if>
+            <if test="content!=null">
+                content =#{content} ,
+            </if>
+            <if test="img1!=null">
+                img1 =#{img1} ,
+            </if>
+            <if test="img2!=null">
+                img2 =#{img2} ,
+            </if>
+            <if test="img3!=null">
+                img3 =#{img3} ,
+            </if>
+            <if test="img4!=null">
+                img4 =#{img4} ,
+            </if>
+            <if test="img5!=null">
+                img5 =#{img5} ,
+            </if>
+            <if test="type!=null">
+                type =#{type} ,
+            </if>
+            <if test="updateTime!=null">
+                updatetime =#{updateTime} ,
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="countArticle" resultType="java.lang.Long">
+        select count(a.id)
+        from community_article a
+        left join vip_information b on a.vipId = b.id
+        where 1=1
+        <if test="type != null">
+            and a.type = #{type}
+        </if>
+        <if test="vipName !=null">
+            and b.name like concat('%',#{vipName},'%')
+        </if>
+        <if test="title !=null">
+            and a.title like concat('%',#{title},'%')
+        </if>
+    </select>
+
+    <select id="findArticle" resultType="com.bgd.admin.entity.ArticleManagerDto">
+        select a.id,a.no,a.vipId,a.title,a.content,a,`like`,a.img1,a.img2,a.img3,a.img4,a.img5,a.type,b.name levelName
+        from community_article a
+        left join vip_information b on a.vipId = b.id
+        where 1=1
+        <if test="type != null">
+            and a.type = #{type}
+        </if>
+        <if test="vipName !=null">
+            and b.name like concat('%',#{vipName},'%')
+        </if>
+        <if test="title !=null">
+            and a.title like concat('%',#{title},'%')
+        </if>
+        limit #{pageNo},#{pageSize}
+    </select>
+
+</mapper>

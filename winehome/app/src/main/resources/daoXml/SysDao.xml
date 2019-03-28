@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.app.dao.SysDao">
+
+
+    <select id="findRegionByCode" parameterType="java.lang.String" resultType="com.bgd.support.entity.SysRegionPo">
+        select code,name,parentcode from sys_region
+        where 1=1
+        <if test="code !=null">
+            and parentcode =#{code}
+        </if>
+    </select>
+
+    <select id="findSysOs" resultType="com.bgd.support.entity.SysOsPo">
+        select id, type, url, indx, version, remark, createtime  from sys_os
+        order by createtime desc
+        limit 1
+    </select>
+
+</mapper>

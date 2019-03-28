@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.app.dao.ChateauDao">
+
+
+    <select id="countCountry"
+            resultType="java.lang.Long">
+        select count(id) from mall_country
+    </select>
+
+
+    <select id="pageCountry" parameterType="com.bgd.support.base.PageParam"
+            resultType="com.bgd.support.entity.MallCountryPo">
+        select id,name, logo from mall_country
+        limit #{pageNo},#{pageSize}
+    </select>
+
+
+    <select id="listChateauByCategory" parameterType="com.bgd.app.entity.MallChateauDto"
+            resultType="com.bgd.app.entity.MallChateauDto">
+        select a.id,a.name,a.logo,a.categoryid ,b.name categoryname,c.name countryname
+        from mall_chateau a
+        left join product_category b on a.categoryid=b.id
+        left join mall_country c on a.countryid=c.id
+        where 1=1
+        <if test="countryId !=null">
+            and a.countryId=#{countryId}
+        </if>
+        <if test="categoryId !=null">
+            and a.categoryid=#{categoryId}
+        </if>
+        <if test="categoryName !=null">
+            and b.name like concat('%',#{categoryName},'%')
+        </if>
+        <if test="pageSize !=null">
+            limit #{pageNo},#{pageSize}
+        </if>
+
+    </select>
+
+
+    <select id="countChateauByRank" parameterType="com.bgd.app.entity.param.ChateauParam" resultType="java.lang.Long">
+        select count(a.id)
+        from mall_chateau a
+        left join (
+        select chateauid ,sum(count) sales
+        from mall_sale_day t
+        group by t.chateauid
+        ) b on a.id=b.chateauid
+        left join mall_country c on a.countryid=c.id
+        left join product_category d on a.categoryid = d.id
+        where 1=1
+        <if test="categoryName !=null">
+            and d.name like concat('%',#{categoryName},'%')
+        </if>
+        <if test="countryId !=null">
+            and c.id =#{countryId}
+        </if>
+    </select>
+
+    <select id="pageChateauByRank" parameterType="com.bgd.app.entity.param.ChateauParam"
+            resultType="com.bgd.app.entity.MallChateauDto">
+        select a.id chateauid,a.name chateauname,a.logo chateaulogo ,c.logo countrylogo ,c.name countryname,d.name
+        categoryname
+        from mall_chateau a
+        left join (
+        select chateauid ,sum(count) sales
+        from mall_sale_day t
+        group by t.chateauid
+        ) b on a.id=b.chateauid
+        left join mall_country c on a.countryid=c.id
+        left join product_category d on a.categoryid = d.id
+        where 1=1
+        <if test="categoryName !=null">
+            and d.name like concat('%',#{categoryName},'%')
+        </if>
+        <if test="countryId !=null">
+            and c.id =#{countryId}
+        </if>
+        order by b.sales desc
+        limit #{pageNo},#{pageSize}
+    </select>
+
+    <select id="countChateauByStar" parameterType="com.bgd.app.entity.param.ChateauParam" resultType="java.lang.Long">
+        select count(a.id)
+        from
+        mall_chateau a
+        left join (
+        select t.star,
+        t.chateauid
+        from
+        mall_sale_star t
+        ) b on a.id = b.chateauid
+        left join mall_country c on a.countryid=c.id
+        left join product_category d on a.categoryid = d.id
+        where 1=1
+        <if test="categoryName !=null">
+            and d.name like concat('%',#{categoryName},'%')
+        </if>
+        <if test="countryId !=null">
+            and c.id =#{countryId}
+        </if>
+    </select>
+
+
+    <select id="pageChateauByStar" parameterType="com.bgd.app.entity.param.ChateauParam"
+            resultType="com.bgd.app.entity.MallChateauDto">
+        select
+        a.id chateauid,a.name chateauname,a.logo chateaulogo ,c.name countryname,d.name
+        categoryname
+        from
+        mall_chateau a
+        left join (
+        select t.star,
+        t.chateauid
+        from
+        mall_sale_star t
+        ) b on a.id = b.chateauid
+        left join mall_country c on a.countryid=c.id
+        left join product_category d on a.categoryid = d.id
+        where 1=1
+        <if test="categoryName !=null">
+            and d.name like concat('%',#{categoryName},'%')
+        </if>
+        <if test="countryId !=null">
+            and c.id =#{countryId}
+        </if>
+        order by b.star desc
+        limit #{pageNo},#{pageSize}
+    </select>
+
+    <select id="countChateauByRankAndStar" parameterType="com.bgd.app.entity.param.ChateauParam"
+            resultType="java.lang.Long">
+        select
+        count(a.id)
+        from
+        mall_chateau a
+        left join (
+        select t.star,
+        t.chateauid
+        from
+        mall_sale_star t
+        ) b on a.id = b.chateauid
+        left join (
+        select chateauid ,sum(count) sales
+        from mall_sale_day t
+        group by t.chateauid
+        ) e on a.id=e.chateauid
+        left join mall_country c on a.countryid=c.id
+        left join product_category d on a.categoryid = d.id
+        where 1=1
+        <if test="categoryName !=null">
+            and d.name like concat('%',#{categoryName},'%')
+        </if>
+        <if test="countryId !=null">
+            and c.id =#{countryId}
+        </if>
+    </select>
+
+    <select id="pageChateauByRankAndStar" parameterType="com.bgd.app.entity.param.ChateauParam"
+            resultType="com.bgd.app.entity.MallChateauDto">
+        select
+        a.id chateauid,a.name chateauname,a.logo chateaulogo ,c.name countryname,d.name
+        categoryname
+        from
+        mall_chateau a
+        left join (
+        select t.star,
+        t.chateauid
+        from
+        mall_sale_star t
+        ) b on a.id = b.chateauid
+        left join (
+        select chateauid ,sum(count) sales
+        from mall_sale_day t
+        group by t.chateauid
+        ) e on a.id=e.chateauid
+        left join mall_country c on a.countryid=c.id
+        left join product_category d on a.categoryid = d.id
+        where 1=1
+        <if test="categoryName !=null">
+            and d.name like concat('%',#{categoryName},'%')
+        </if>
+        <if test="countryId !=null">
+            and c.id =#{countryId}
+        </if>
+        order by e.sales, b.star desc
+        limit #{pageNo},#{pageSize}
+
+    </select>
+
+
+    <select id="findChateauOne" parameterType="com.bgd.app.entity.param.ChateauParam"
+            resultType="com.bgd.app.entity.MallChateauDto">
+        select
+        a.id ,a.name,a.logo,a.video,a.backimg,b.name countryname,b.logo countrylogo
+        from mall_chateau a
+        left join mall_country b on a.countryid=b.id
+        left join product_information c on a.id=c.chateauid
+        where 1=1
+        <if test="productId !=null">
+            and c.id =#{productId}
+        </if>
+        <if test="chateauId !=null">
+            and a.id =#{chateauId}
+        </if>
+    </select>
+
+</mapper>

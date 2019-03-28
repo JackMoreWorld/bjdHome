@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.app.dao.ProDao">
+
+
+    <resultMap id="productMap" type="com.bgd.app.entity.ProductDto">
+        <collection property="imgs" column="id" select="findImgById"/>
+    </resultMap>
+
+    <select id="findImgById" resultType="com.bgd.support.entity.ProductImgPo" parameterType="java.lang.Long">
+        select  id, productid, type, img from product_img
+        where productid =#{id}
+    </select>
+
+
+    <select id="findProDetailByMap" parameterType="map" resultMap="productMap">
+        select a.id,a.id productId,a.name,a.logo,a.capacity,a.alcohol,a.flavor,a.discount,
+         b.id countryid,b.logo countrylogo,b.name countryname ,
+         c.id chateauid,c.name chateauname, c.logo chateaulogo
+        from product_information a
+        left join mall_country b on a.countryid =b.id
+        left join mall_chateau c  on a.chateauid = c.id
+        where a.id =#{productId}
+    </select>
+
+    <select id="findNewCapacity" resultType="string">
+        select a.newcapacity  from mall_ad_product a
+        where a.productid = #{proId}
+        union all
+        select b.newcapacity  from mall_activity_product b
+        where b.productid=#{proId}
+        limit 1
+    </select>
+
+
+    <select id="countProductEvaByObj" resultType="java.lang.Long" parameterType="com.bgd.app.entity.param.ProParam">
+     select  count(a.id)
+     from product_evaluation  a
+     left join vip_information b on a.vipid=b.id
+     where a.productid = #{productId}
+    </select>
+
+
+    <select id="pageProductEvaByObj" resultType="com.bgd.app.entity.ProductEvaluatDto"
+            parameterType="com.bgd.app.entity.param.ProParam">
+     select a.id,a.vipid,a.content,a.img1,a.img2,a.img3,a.img4,a.img5,b.logo  viplogo,b.name vipname
+     from product_evaluation  a
+     left join vip_information b on a.vipid=b.id
+     where a.productid = #{productId}
+     limit #{pageNo},#{pageSize}
+    </select>
+
+    <select id="findChateauByProId" parameterType="java.lang.Long" resultType="com.bgd.app.entity.MallChateauDto">
+        select t.id,t.name ,t.logo  from mall_chateau t
+        inner join product_information p  on t.id = p.chateauid
+        where  p.id = #{proId}
+    </select>
+
+    <select id="countProByChateauId" parameterType="java.lang.Long" resultType="java.lang.Long">
+        select count(id)  from product_information
+        where chateauid =#{chateauId}
+    </select>
+
+    <select id="countProByObj" parameterType="com.bgd.app.entity.param.ProParam" resultType="java.lang.Long">
+        select count(id) from product_information
+        where 1=1
+        <if test="chateauId != null">
+            and chateauid =#{chateauId}
+        </if>
+    </select>
+
+    <select id="pageProByObj" parameterType="com.bgd.app.entity.param.ProParam"
+            resultType="com.bgd.support.entity.ProductInformationPo">
+        select id,name,logo,capacity from product_information
+        where 1=1
+        <if test="chateauId != null">
+            and chateauid =#{chateauId}
+        </if>
+        limit #{pageNo},#{pageSize}
+    </select>
+
+    <insert id="saveProEva" parameterType="com.bgd.support.entity.ProductEvaluatPo">
+        insert into product_evaluation
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="productId!=null">
+                productid ,
+            </if>
+            <if test="vipId !=null">
+                vipId ,
+            </if>
+            <if test="title !=null">
+                title ,
+            </if>
+            <if test="content!=null">
+                content,
+            </if>
+            <if test="img1!=null">
+                img1 ,
+            </if>
+            <if test="img2!=null">
+                img2 ,
+            </if>
+            <if test="img3!=null">
+                img3 ,
+            </if>
+            <if test="img4!=null">
+                img4 ,
+            </if>
+            <if test="img5!=null">
+                img5 ,
+            </if>
+            <if test="type!=null">
+                type ,
+            </if>
+            <if test="createTime!=null">
+                createtime ,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="productId!=null">
+                #{productId} ,
+            </if>
+            <if test="vipId !=null">
+                #{vipId} ,
+            </if>
+            <if test="title !=null">
+                #{title } ,
+            </if>
+            <if test="content!=null">
+                #{content},
+            </if>
+            <if test="img1!=null">
+                #{img1 },
+            </if>
+            <if test="img2!=null">
+                #{img2} ,
+            </if>
+            <if test="img3!=null">
+                #{img3 },
+            </if>
+            <if test="img4!=null">
+                #{img4} ,
+            </if>
+            <if test="img5!=null">
+                #{img5} ,
+            </if>
+            <if test="type!=null">
+                #{type} ,
+            </if>
+            <if test="createTime!=null">
+                #{createtime} ,
+            </if>
+        </trim>
+    </insert>
+
+
+    <select id="countFilterPro" parameterType="com.bgd.app.entity.param.ProParam" resultType="long">
+        select count(a.id)
+        from product_information a
+        left join mall_activity_product b on a.id =b.productid
+        where 1=1
+        <if test="chateauId !=null">
+            and a.chateauid =#{chateauId}
+        </if>
+        <if test="categoryId != null">
+            and a.categoryid =#{categoryId}
+        </if>
+        <if test="minAlcohol !=null">
+            and a.alcohol between #{minAlcohol} and #{maxAlcohol}
+        </if>
+        <if test="minPrice !=null">
+            and a.price between #{minPrice} and #{maxPrice}
+        </if>
+    </select>
+
+    <select id="pageFilterPro" parameterType="com.bgd.app.entity.param.ProParam"
+            resultType="com.bgd.app.entity.ProductDto">
+        select a.id,a.name,a.logo,a.capacity,ab.newcapacity from product_information a
+        left join
+        (select a.newcapacity,a.productid  from mall_ad_product a
+        union all
+        select b.newcapacity,b.productid from mall_activity_product b
+        limit 1) ab  on a.id =ab.productid
+        where 1=1
+        <if test="chateauId !=null">
+            and a.chateauid =#{chateauId}
+        </if>
+        <if test="categoryId != null">
+            and a.categoryid =#{categoryId}
+        </if>
+        <if test="minAlcohol !=null">
+            and a.alcohol between #{minAlcohol} and #{maxAlcohol}
+        </if>
+        <if test="minPrice !=null">
+            and a.price between #{minPrice} and #{maxPrice}
+        </if>
+        limit #{pageNo} ,#{pageSize}
+    </select>
+
+</mapper>

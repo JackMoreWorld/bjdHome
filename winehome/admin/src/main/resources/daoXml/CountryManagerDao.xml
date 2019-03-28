@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.admin.dao.CountryManagerDao">
+
+    <insert id="addCountry" keyProperty="id" useGeneratedKeys="true">
+        insert  into mall_country
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name!=null">
+                name ,
+            </if>
+            <if test="logo!=null">
+                logo ,
+            </if>
+            <if test="phrase!=null">
+                phrase ,
+            </if>
+            <if test="dataStatus!=null">
+                dataStatus ,
+            </if>
+            <if test="remark!=null">
+                remark ,
+            </if>
+            <if test="createTime!=null">
+                createtime ,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name!=null">
+                #{name} ,
+            </if>
+            <if test="logo!=null">
+                #{logo} ,
+            </if>
+            <if test="phrase!=null">
+                #{phrase} ,
+            </if>
+            <if test="dataStatus!=null">
+                #{dataStatus} ,
+            </if>
+            <if test="remark!=null">
+                #{remark} ,
+            </if>
+            <if test="createTime!=null">
+                createtime =#{createTime} ,
+            </if>
+        </trim>
+    </insert>
+
+    <delete id="deleteCountry" parameterType="java.lang.Long">
+      delete from mall_country
+      where  id = #{countryId}
+    </delete>
+
+
+    <update id="updateCountry">
+        update mall_country
+        <set>
+            <if test="name!=null">
+                name =#{name} ,
+            </if>
+            <if test="logo!=null">
+                logo =#{logo} ,
+            </if>
+            <if test="phrase!=null">
+                phrase =#{phrase} ,
+            </if>
+            <if test="dataStatus!=null">
+                dataStatus =#{dataStatus} ,
+            </if>
+            <if test="remark!=null">
+                remark =#{remark} ,
+            </if>
+            <if test="updateTime!=null">
+                updatetime =#{updateTime} ,
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="countCountry"  resultType="java.lang.Long">
+        select count(t.id)
+        from mall_country t
+        where 1 = 1
+        <if test="name != null">
+            and t.name like concat ('%',#{name},'%')
+        </if>
+    </select>
+
+    <select id="findCountry" resultType="com.bgd.admin.entity.CountryManagerDto">
+        select t.id,t.name,t.logo,t.phrase,t.remark,t.dataStatus
+        from mall_country t
+        where 1 = 1
+        <if test="name != null">
+           and t.name like concat ('%',#{name},'%')
+        </if>
+        <if test="dataStatus != null">
+            and t.dataStatus = #{dataStatus}
+        </if>
+        limit #{pageNo},#{pageSize}
+    </select>
+
+</mapper>

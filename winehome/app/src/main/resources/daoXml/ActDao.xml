@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.app.dao.ActDao">
+
+    <select id="findBannerList" resultType="com.bgd.support.entity.MallBannerPo">
+      select id, img, adid  from  mall_banner
+    </select>
+
+
+    <select id="findMallActivity" resultType="com.bgd.support.entity.MallActivityPo">
+       select t.id,t.img,t.name,t.title,t.type
+       from mall_activity t
+       where t.status=1
+    </select>
+
+
+    <select id="findHomeActPro" parameterType="map" resultType="com.bgd.app.entity.MallActivityProductDto">
+    select  b.logo,b.name,b.capacity ,a.newcapacity,a.activityid   from mall_activity_product a
+    left join product_information b on a.productid=b.id
+    where a.activityid=#{actId} limit #{limit}
+    </select>
+
+    <select id="findHomeLimitActPro" parameterType="map" resultType="com.bgd.app.entity.MallActivityProductDto">
+    select  b.logo,b.name,b.capacity ,a.newcapacity ,a.starttime  startTimeStr ,a.endtime endtimeStr from mall_activity_product a
+    left join product_information b on a.productid=b.id
+    where a.activityid=#{actId} and a.starttime <![CDATA[<=now()]]>  and a.endtime >=now()
+    order by a.starttime
+    limit #{limit}
+    </select>
+
+
+    <select id="findRankActPro" parameterType="map" resultType="com.bgd.app.entity.MallActivityProductDto">
+     select sum(a.count) sales,a.productid,b.name,b.logo ,b.capacity from mall_sale_day a
+     left join product_information  b  on a.productid = b.id
+     group by a.productid
+     order by  sales desc
+     limit #{limit}
+    </select>
+
+
+    <update id="likeOrNot" parameterType="com.bgd.app.entity.LikeDto">
+      update mall_activity_product a
+      set a.like = a.like +#{step}
+      where a.activityid=#{actId} and a.productd=#{proId}
+      and a.like >=0
+    </update>
+
+
+    <select id="findLimitTiming" parameterType="map" resultType="com.bgd.app.entity.TimingDto">
+            select
+            starttime,endtime
+        from
+            mall_activity_product
+        where
+            activityid = #{actId}
+        and actday = #{actDay}
+        group by
+            starttime
+        order by
+            starttime
+    </select>
+
+
+    <select id="countLimitActPro" parameterType="com.bgd.app.entity.param.ActProParam" resultType="java.lang.Long">
+        select count(id) from mall_activity_product
+        where activityid=#{actId}
+        and actday= #{actDay}
+        and starttime=#{timing}
+    </select>
+
+
+    <select id="pageLimitActPro" parameterType="com.bgd.app.entity.param.ActProParam"
+            resultType="com.bgd.app.entity.LimitActProDto">
+        select a.activityid actid, a.productid,a.newcapacity,a.total, a.remain ,b.name productname,b.capacity,b.logo
+        from mall_activity_product a
+        left join product_information b  on a.productid =b.id
+        where a.actday=#{actDay}
+        and a.activityid=#{actId}
+        and a.starttime=#{timing}
+        limit #{pageNo},#{pageSize}
+    </select>
+
+
+    <select id="findCategoryList" parameterType="map" resultType="com.bgd.support.entity.ProductCategoryPo">
+       select b.id,b.name,b.img  from mall_activity_product a
+       left join product_category b on  a.categoryid=b.id
+       where a.activityid=#{actId}
+    </select>
+
+    <select id="countGoodActPro" parameterType="com.bgd.app.entity.param.ActProParam" resultType="java.lang.Long">
+         select count(a.id)
+         from mall_activity_product a
+        left join product_information b on a.productid=b.id
+        where a.activityid=#{actId}
+        and a.categoryid=#{categoryId}
+
+</select>
+
+    <select id="pageGoodActPro" parameterType="com.bgd.app.entity.param.ActProParam"
+            resultType="com.bgd.app.entity.GoodActProDto">
+        select a.id actId,a.like,b.name productName,b.logo,a.productid,c.id chateauid,c.name chateauname
+         from mall_activity_product a
+        left join product_information b on a.productid=b.id
+        left join mall_chateau c on b.chateauid=c.id
+        where a.activityid=#{actId}
+        and a.categoryid=#{categoryId}
+        limit #{pageNo},#{pageSize}
+    </select>
+
+    <select id="queryCategoryList" resultType="com.bgd.support.entity.ProductCategoryPo">
+       SELECT DISTINCT b.id,b.`name`,b.img
+        FROM mall_sale_day a
+        JOIN product_category b ON a.categoryid =b.id
+        WHERE 1=1
+    </select>
+
+    <select id="queryProRankingList" resultType="com.bgd.app.entity.ProRankingDto">
+        SELECT DISTINCT a.productid AS productId,a.categoryid AS categoryId,
+        a.count,b.`name` AS productName,b.logo,b.capacity
+        FROM product_information b
+        LEFT JOIN mall_sale_day a ON a.productid = b.id
+        WHERE 1=1 AND a.categoryid = #{categoryId}
+        order by a.count desc
+        limit #{pageNo},#{pageSize}
+    </select>
+
+    <select id="queryProRankingCount" resultType="java.lang.Long">
+        SELECT count(b.id)
+        FROM mall_sale_day a
+        JOIN product_information b ON a.productid = b.id
+        WHERE 1=1 AND a.categoryid = #{categoryId}
+        limit 1
+    </select>
+
+    <select id="findMallActivityById" resultType="com.bgd.support.entity.MallActivityPo">
+       select t.id,t.img,t.name,t.title,t.type
+       from mall_activity t
+       where t.id = #{0}
+    </select>
+
+    <select id="queryFirstNewProList" resultType="com.bgd.app.entity.FirstNewProDto">
+        SELECT a.productid AS productId,a.categoryid AS categoryId,
+        b.`name` AS productName,b.logo,a.newcapacity
+        FROM mall_activity_product a
+        left JOIN product_information b ON a.productid = b.id
+        WHERE 1=1 AND a.activityid = #{actId}
+        ORDER BY a.createtime DESC
+        limit #{pageNo},#{pageSize}
+    </select>
+
+    <select id="queryFirstNewProCount" resultType="java.lang.Long">
+        SELECT count(b.id)
+        FROM mall_activity_product a
+        left JOIN product_information b ON a.productid = b.id
+        WHERE 1=1 AND a.activityid = #{actId}
+        limit 1
+    </select>
+</mapper>

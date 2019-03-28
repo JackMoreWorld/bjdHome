@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.admin.dao.ProductManagerDao">
+
+    <insert id="addProduct" useGeneratedKeys="true" keyProperty="id">
+        insert  into product_information
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name!=null">
+                name ,
+            </if>
+            <if test="logo!=null">
+                logo ,
+            </if>
+            <if test="countryId!=null">
+                countryId ,
+            </if>
+            <if test="categoryId!=null">
+                categoryId ,
+            </if>
+            <if test="chateauId!=null">
+                chateauId ,
+            </if>
+            <if test="flavor!=null">
+                flavor ,
+            </if>
+            <if test="alcohol!=null">
+                alcohol ,
+            </if>
+            <if test="price!=null">
+                price ,
+            </if>
+            <if test="specifications!=null">
+                specifications ,
+            </if>
+            <if test="discount!=null">
+                discount ,
+            </if>
+            <if test="remark!=null">
+                remark ,
+            </if>
+            <if test="createTime!=null">
+                createtime ,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name!=null">
+                #{name} ,
+            </if>
+            <if test="logo!=null">
+                #{logo} ,
+            </if>
+            <if test="countryId!=null">
+                #{countryId} ,
+            </if>
+            <if test="categoryId!=null">
+                #{categoryId} ,
+            </if>
+            <if test="chateauId!=null">
+                #{chateauId} ,
+            </if>
+            <if test="flavor!=null">
+                #{flavor} ,
+            </if>
+            <if test="alcohol!=null">
+                #{alcohol} ,
+            </if>
+            <if test="price!=null">
+                #{price} ,
+            </if>
+            <if test="specifications!=null">
+                #{specifications} ,
+            </if>
+            <if test="discount!=null">
+                #{discount} ,
+            </if>
+            <if test="remark!=null">
+                #{remark} ,
+            </if>
+            <if test="createTime!=null">
+                #{createTime} ,
+            </if>
+        </trim>
+    </insert>
+
+    <delete id="deleteProduct" parameterType="java.lang.Long">
+      delete from product_information
+      where  id = #{productId}
+    </delete>
+
+
+    <update id="updateProduct">
+        update product_information
+        <set>
+            <if test="name!=null">
+                name =#{name} ,
+            </if>
+            <if test="logo!=null">
+                logo =#{logo} ,
+            </if>
+            <if test="countryId!=null">
+                countryId =#{countryId} ,
+            </if>
+            <if test="categoryId!=null">
+                categoryId =#{categoryId} ,
+            </if>
+            <if test="chateauId!=null">
+                chateauId =#{chateauId} ,
+            </if>
+            <if test="flavor!=null">
+                flavor =#{flavor} ,
+            </if>
+            <if test="alcohol!=null">
+                alcohol =#{alcohol} ,
+            </if>
+            <if test="price!=null">
+                price =#{price} ,
+            </if>
+            <if test="specifications!=null">
+                specifications =#{specifications} ,
+            </if>
+            <if test="discount!=null">
+                discount =#{discount} ,
+            </if>
+            <if test="remark!=null">
+                remark =#{remark} ,
+            </if>
+            <if test="updateTime!=null">
+                updatetime =#{updateTime} ,
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+
+    <select id="countProduct" resultType="java.lang.Long">
+        select count(a.id)
+        from product_information a
+        left join mall_country b on a.countryId = b.id
+        left join product_category c on a.categoryId = c.id
+        left join mall_chateau d on a.chateauId = d.id
+        where 1 = 1
+        <if test="name != null">
+            and a.name like concat('%',#{name},'%')
+        </if>
+        <if test="countryName != null">
+            and b.name like concat('%',#{countryName},'%')
+        </if>
+        <if test="categoryName != null">
+            and c.name like concat('%',#{categoryName},'%')
+        </if>
+        <if test="chateauName != null">
+            and c.name like concat('%',#{chateauName},'%')
+        </if>
+    </select>
+
+    <select id="findProduct" resultType="com.bgd.admin.entity.ProductManagerDto">
+        select a.id,a.name,a.logo,a.countryId,a.categoryId,a.chateauId,a.flavor,
+        a.alcohol,a.price,a.specifications,a.discount,a.remark,a.createtime,
+        b.name countryName,c.name categoryName,d.name chateauName
+        from product_information a
+        left join mall_country b on a.countryId = b.id
+        left join product_category c on a.categoryId = c.id
+        left join mall_chateau d on a.chateauId = d.id
+        where 1=1
+        <if test="name != null">
+            and a.name like concat('%',#{name},'%')
+        </if>
+        <if test="countryName != null">
+            and b.name like concat('%',#{countryName},'%')
+        </if>
+        <if test="categoryName != null">
+            and c.name like concat('%',#{categoryName},'%')
+        </if>
+        <if test="chateauName != null">
+            and c.name like concat('%',#{chateauName},'%')
+        </if>
+        limit #{pageNo},#{pageSize}
+    </select>
+
+    <select id="findOneProduct" resultMap="productImgMap">
+        select a.id,a.name,a.logo,a.countryId,a.categoryId,a.chateauId,a.flavor,
+        a.alcohol,a.price,a.specifications,a.discount,a.remark,a.createtime,
+        b.name countryName,c.name categoryName,d.name chateauName
+        from product_information a
+        left join mall_country b on a.countryId = b.id
+        left join product_category c on a.categoryId = c.id
+        left join mall_chateau d on a.chateauId = d.id
+        where a.id = #{productId}
+        limit 1
+    </select>
+
+    <resultMap id="productImgMap" type="com.bgd.admin.entity.ProductManagerDto">
+        <collection property="imgS" column="id" select="findProductImgById"/>
+    </resultMap>
+
+    <select id="findProductImgById" resultType="com.bgd.admin.entity.ProImgManagerDto" parameterType="java.lang.Long">
+        select id, productid, type, img, sort
+        from product_img
+        where productid = #{id}
+    </select>
+
+</mapper>

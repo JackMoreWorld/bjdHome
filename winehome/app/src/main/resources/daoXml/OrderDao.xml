@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.app.dao.OrderDao">
+
+    <insert id="insertOrder" parameterType="com.bgd.app.entity.MallOrderDto"
+            useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO `mall_order` (
+            `vipid`,
+            `orderno`,
+            `addrid`,
+            `paytype`,
+            `price`,
+            `status`,
+            `linkman`,
+            `linkphone`,
+            `linkaddress`,
+            `deliverytype`,
+            `logisticsno`,
+            `freight`,
+            `couponsid`,
+            `discountprice`,
+            `remark`,
+            `datastatus`,
+            `createtime`,
+            `updatetime`
+        )
+        VALUES
+            (
+                #{vipId},
+                #{orderNo},
+                #{addrId},
+                #{payType},
+                #{price},
+                #{status},
+                #{linkMan},
+                #{linkPhone},
+                #{linkAddress},
+                #{deliveryType},
+                #{logisticsNo},
+                #{freight},
+                #{couponsId},
+                #{discountPrice},
+                #{remark},
+                '0',
+                now(),
+                NULL
+            );
+    </insert>
+
+    <insert id="insertOrderDetail" parameterType="com.bgd.support.entity.MallOrderDetailPo">
+        INSERT INTO `mall_order_detail` (
+        `vipid`,
+        `orderid`,
+        `productid`,
+        `activityid`,
+        `capacity`,
+        `status`,
+        `count`,
+        `totalprice`,
+        `createtime`
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.vipId},
+            #{item.orderId},
+            #{item.productId},
+            #{item.activityId},
+            #{item.capacity},
+            #{item.status},
+            #{item.count},
+            #{item.totalPrice},
+            now()
+            )
+        </foreach>
+    </insert>
+
+    <select id="getOrderInfo" resultType="com.bgd.app.entity.VipOrderDto" parameterType="java.lang.String">
+        SELECT a.id,a.vipid,a.orderno,a.addrid,a.paytype,a.price,a.status,
+        a.linkman,a.linkphone,a.linkaddress,a.deliverytype,a.logisticsno,a.freight,
+        a.couponsid,a.remark,a.createtime,IFNULL(a.discountPrice,0) as discountPrice
+        FROM mall_order a
+        WHERE a.datastatus = '0' AND a.orderno = #{orderNo}
+        <if test="vipId !=null and vipId !=''">
+            AND a.vipid = #{vipId}
+        </if>
+        limit 1
+    </select>
+
+    <update id="delOrder" parameterType="java.lang.String">
+        UPDATE `mall_order`
+        SET
+         `datastatus` = '1',
+         `updatetime` = now()
+        WHERE
+            id = #{orderId} AND vipid = #{vipId}
+    </update>
+
+    <update id="delOrderDetail" parameterType="java.lang.String">
+        UPDATE mall_order_detail
+        SET
+         `datastatus` = '1'
+        WHERE
+            orderid = #{orderId} AND vipid = #{vipId}
+    </update>
+
+    <update id="updOrderInfo" parameterType="com.bgd.support.entity.MallOrderPo">
+        UPDATE `mall_order`
+        SET
+            `paytype` = #{payType},
+            `status` = #{status},
+            `updatetime` = now()
+        WHERE
+             orderno = #{orderNo}
+    </update>
+
+    <update id="updOrderDetail" parameterType="com.bgd.support.entity.MallOrderDetailPo">
+        UPDATE mall_order_detail
+        SET
+            status = #{status},
+            paytime = now()
+        WHERE
+             id = #{orderId}
+    </update>
+
+    <update id="updOrderStatus" parameterType="com.bgd.support.entity.MallOrderDetailPo">
+        UPDATE mall_order_detail
+        SET
+            status = #{status},
+            paytime = now()
+        WHERE
+             orderid = #{orderId}
+    </update>
+
+    <insert id="insertCapitalFlow" parameterType="com.bgd.app.entity.MallCapitalFlowDto">
+        INSERT INTO `mall_capitalflow` (
+            `vipid`,
+            `usertype`,
+            `relationid`,
+            `dir`,
+            `trademoney`,
+            `tradesource`,
+            `thirdtradeno`,
+            `paytype`,
+            `remark`,
+            `createtime`
+        )
+        VALUES
+            (
+                #{vipId},
+                #{userType},
+                #{relationId},
+                #{dir},
+                #{tradeMoney},
+                #{tradeSource},
+                #{thirdTradeNo},
+                #{payType},
+                #{remark},
+                now()
+            );
+    </insert>
+
+    <update id="confirmReceipt" parameterType="java.lang.String">
+        UPDATE mall_order_detail
+        SET
+            status = '6'
+        WHERE
+             id = #{orderId} AND vipid = #{vipId} and status = '5'
+    </update>
+
+
+    <select id="findProductByOrderId" resultType="com.bgd.support.entity.ProductInformationPo"
+            parameterType="java.lang.Long">
+        select a.id , a.countryid,a.chateauid  from
+        product_information  a
+        left join mall_order_detail b
+        on  a.id =b.productid
+        where b.orderid = #{orderId}
+    </select>
+
+    <update id="saveOrUpdateOrderStar" parameterType="com.bgd.support.entity.MallOrderStarPo">
+        insert into mall_sale_star ( countryid,  chateauid,  productid,star  )
+        values (  #{countryId}, #{chateauId}, #{productId} ,#{star} )
+        on duplicate key update  star = star + #{star}
+    </update>
+
+    <update id="updOrderDetails" parameterType="com.bgd.support.entity.MallOrderDetailPo">
+        UPDATE mall_order_detail
+        SET
+            status = #{status}
+        WHERE
+            id = #{orderId} and (status = '2' or status = '5')
+    </update>
+
+    <insert id="insertRefund" parameterType="com.bgd.app.entity.MallOrderRefundDto">
+        INSERT INTO `mall_order_refund` (
+            `refundno`,
+            `vipid`,
+            `detailid`,
+            `orderstatus`,
+            `status`,
+            `remark`,
+            `createtime`
+        )
+        VALUES
+            (
+                #{refundNo}
+                #{vipId},
+                #{detailId},
+                #{orderStatus},
+                #{status},
+                NULL,
+                now()
+            );
+    </insert>
+
+    <insert id="insertOrderEvaluate">
+        INSERT INTO `mall_order_evaluation` (
+            `detailid`,
+            `remark`,
+            `img1`,
+            `img2`,
+            `star`,
+            `createtime`
+        )
+        VALUES
+            (
+                #{detailId},
+                #{remark},
+                NULL,
+                NULL,
+                #{star},
+                now()
+            )
+    </insert>
+
+    <update id="orderEvaluate" parameterType="java.lang.String">
+        UPDATE mall_order_detail
+        SET
+            status = #{status}
+        WHERE
+            id = #{orderId} and status = '6'
+    </update>
+
+    <update id="updCouponStatus" parameterType="java.lang.Long">
+        UPDATE `vip_coupons`
+        SET
+         `status` = '2',
+         `updatetime` = now()
+        WHERE
+            id = #{couponId} AND vipid = #{vipId}
+    </update>
+
+    <update id="delOrderDetailById" parameterType="java.lang.String">
+        UPDATE mall_order_detail
+        SET
+         `datastatus` = '1'
+        WHERE
+            id = #{detailId} AND vipid = #{vipId}
+    </update>
+
+    <select id="getOrderDetail" resultType="com.bgd.app.entity.MallOrderDetailDto">
+        SELECT a.id,a.vipid,a.orderid,a.productid,a.activityid,a.capacity,
+        a.`status`,a.count,a.totalprice,a.paytime,a.deliverytime,a.refundtime
+        ,b.`name` as productName,b.logo as  productLogo,v.`name` as addrName,v.phone,v.addr
+        from mall_order_detail a
+        LEFT JOIN product_information b ON a.productid = b.id
+        LEFT JOIN mall_order c ON a.orderid = c.id
+		LEFT JOIN vip_addr v ON c.addrid = v.id
+        WHERE a.datastatus = '0' AND a.id = #{detailId}  AND a.vipid = #{vipId}
+        LIMIT 1
+    </select>
+
+    <select id="getOrderListByPage"
+            resultType="com.bgd.app.entity.MallOrderDetailDto">
+        SELECT a.id,a.vipid,a.orderid,a.productid,a.activityid,a.capacity,
+        a.`status`,a.count,a.totalprice,a.paytime,a.deliverytime,a.refundtime
+        ,b.`name` as productName,b.logo as  productLogo
+        from mall_order_detail a
+        LEFT JOIN product_information b ON a.productid = b.id
+        WHERE datastatus = '0' and a.orderid in
+        <foreach collection="orderIds" separator="," item="item" open="(" close=")">
+            #{item}
+        </foreach>
+        order by id DESC
+    </select>
+
+    <select id="getOrderCount" resultType="java.util.Map">
+        SELECT count(DISTINCT orderid) AS count,orderid
+        from mall_order_detail
+        WHERE datastatus = '0'
+        <if test="vipId != null">
+            and vipid = #{vipId}
+        </if>
+        <if test="status != null">
+            and status = #{status}
+        </if>
+        GROUP BY orderid
+        limit #{pageNo},#{pageSize}
+    </select>
+</mapper>

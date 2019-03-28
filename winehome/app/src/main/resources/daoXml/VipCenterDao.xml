@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.app.dao.VipCenterDao">
+
+
+    <select id="findVipCenterMsg" parameterType="java.lang.Long" resultType="com.bgd.app.entity.VipCenterDto">
+        select
+        a.id vipid,a.logo,a.name,b.balance,b.levelid,b.points,b.vipno,
+        (select count(id)  from vip_collection where vipid=#{vipId})  collectCount,
+        (select count(id) from vip_focus  where vipid =#{vipId}) focusCount,
+        (select count(id) from vip_footmark where vipid =#{vipId})  footCount,
+        (SELECT count(DISTINCT d1.orderid) FROM mall_order_detail d1
+        WHERE d1.`status` = '1'  AND d1.vipid = #{vipId}) as dfkCount,
+        (SELECT count(DISTINCT d2.orderid) FROM mall_order_detail d2
+        WHERE d2.`status` = '2'  AND d2.vipid = #{vipId}) as dfhCount,
+        (SELECT count(DISTINCT d3.orderid) FROM mall_order_detail d3
+        WHERE d3.`status` = '5'  AND d3.vipid = #{vipId}) as dshCount,
+        (SELECT count(DISTINCT d4.orderid) FROM mall_order_detail d4
+        WHERE d4.`status` = '6'  AND d4.vipid = #{vipId}) as dpjCount,
+        (SELECT count(DISTINCT d5.orderid) FROM mall_order_detail d5
+        WHERE d5.`status` in ('3','4')  AND d5.vipid = #{vipId}) as dtkCount
+        from  vip_information  a
+        left join vip_mallinfo  b on a.id =b.vipid
+        where a.id =#{vipId}
+    </select>
+
+    <select id="findVipFocusChateauList" parameterType="java.lang.Long" resultType="com.bgd.app.entity.MallChateauDto">
+        select
+        a.chateauid,b.name,b.logo chateaulogo,
+        c.name countryname,d.name categoryname
+        from vip_focus a
+        left join mall_chateau b on a.chateauid=b.id
+        left join mall_country c on b.countryid = c.id
+        left join product_category d on b.categoryid=d.id
+        where a.status=0
+        <if test="vipId !=null">
+            and a.id =#{vipId}
+        </if>
+    </select>
+
+    <select id="countVipCoupons" parameterType="com.bgd.app.entity.param.CouponsParam" resultType="java.lang.Long">
+        select count(t.id)
+        from vip_coupons t
+        where 1=1
+        <if test="vipId!=null">
+            and t.vipid =#{vipId}
+        </if>
+    </select>
+
+
+    <select id="pageVipCoupons" parameterType="com.bgd.app.entity.param.CouponsParam"
+            resultType="com.bgd.support.entity.VipCouponsPo">
+        select t.id,t.chateauid,
+        t.levelid,t.price,t.mallcouponsid,t.status,t.type
+        from vip_coupons t
+        where 1=1
+        <if test="vipId!=null">
+            and t.vipid =#{vipId}
+        </if>
+        limit #{pageNo},#{pageSize}
+    </select>
+
+
+    <select id="countMallCoupons" resultType="java.lang.Long">
+        select count(t.id)
+        from mall_coupons  t
+    </select>
+
+
+    <select id="pageMallCoupons" parameterType="com.bgd.app.entity.param.CouponsParam"
+            resultType="com.bgd.support.entity.MallCouponsPo">
+        select id, type, chateauid, levelid, price
+        from mall_coupons
+        limit #{pageNo},#{pageSize}
+    </select>
+
+
+    <select id="findVipCouponsList" parameterType="com.bgd.support.entity.VipCouponsPo"
+            resultType="com.bgd.support.entity.VipCouponsPo">
+        select t.id,t.chateauid,
+        t.levelid,t.price,t.mallcouponsid,t.status,t.type
+        from vip_coupons t
+        where 1=1
+        <if test="vipId!=null">
+            and t.vipid =#{vipId}
+        </if>
+        <if test="mallCouponsId!=null">
+            and t.mallCouponsId =#{mallCouponsId}
+        </if>
+        <if test="chateauId!=null">
+            and t.chateauId =#{chateauId}
+        </if>
+    </select>
+
+
+    <select id="countVipFoot" parameterType="com.bgd.app.entity.param.VipSomeParam" resultType="java.lang.Long">
+         select  count(a.id)  from vip_footmark a
+          left join product_information b  on a.productid=b.id
+          where   a.vipid=#{vipId}
+    </select>
+
+    <select id="pageVipFoot" parameterType="com.bgd.app.entity.param.VipSomeParam"
+            resultType="com.bgd.app.entity.VipFootMarkDto">
+          select a.productid, b.name productname,b.capacity,b.logo   from vip_footmark a
+          left join product_information b  on a.productid=b.id
+           where   a.vipid=#{vipId}
+           limit #{pageNo},#{pageSize}
+    </select>
+</mapper>

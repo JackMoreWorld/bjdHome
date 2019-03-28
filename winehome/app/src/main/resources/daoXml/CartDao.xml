@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.app.dao.CartDao">
+
+    <select id="getCartList" parameterType="com.bgd.app.entity.param.CartRequestParam"
+            resultType="com.bgd.app.entity.VipCartDto">
+        SELECT a.id,a.vipid,a.activityid,a.productid,i.capacity
+        ,i.`name`,i.logo,i.discount,a.count,c.`name` AS chateauName,c.logo as chateauLogo,
+        CASE WHEN (count(mc.id)-count(vc.id))>0 THEN 1 ELSE 0 END AS couponFlag,
+        DATE_FORMAT(m.endtime,'%Y-%m-%d %H:%i:%s') as actEndTime
+        FROM vip_cart a
+        LEFT JOIN product_information i ON a.productid = i.id
+        LEFT JOIN mall_chateau c ON i.chateauid = c.id
+        LEFT JOIN mall_activity_product m ON a.activityid = m.activityid
+        LEFT JOIN mall_coupons mc ON i.chateauid = mc.chateauid
+        LEFT JOIN vip_coupons vc ON a.vipid = vc.vipid AND i.chateauid = vc.chateauid
+        WHERE a.datastatus = '0'
+        <if test="vipId != null and  vipId !=''">
+            and a.vipid = #{vipId}
+        </if>
+        GROUP BY a.id
+        order by a.id DESC
+        limit #{pageNo},#{pageSize}
+    </select>
+
+    <select id="getCartListCount" resultType="java.lang.Long">
+        SELECT count(1)
+        FROM vip_cart a
+        LEFT JOIN product_information i ON a.productid = i.id
+        -- LEFT JOIN mall_activity_product m ON a.activityid = m.activityid
+        WHERE a.datastatus = '0' and a.vipid = #{0}
+    </select>
+
+    <update id="delCartById" parameterType="java.lang.Long">
+          UPDATE `vip_cart`
+            SET
+             `datastatus` = '1',
+             `updatetime` = now()
+            WHERE
+                datastatus = '0' and vipid = #{vipId} and id = #{cartId}
+    </update>
+
+    <insert id="addCart" useGeneratedKeys="true" keyProperty="id" parameterType="com.bgd.support.entity.VipCartPo">
+        insert into vip_cart
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="vipId!=null">
+                vipid ,
+            </if>
+            <if test="activityId !=null">
+                activityid ,
+            </if>
+            <if test="productId !=null">
+                productid ,
+            </if>
+            count,
+            createtime ,
+            datastatus
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="vipId!=null">
+                #{vipId} ,
+            </if>
+            <if test="activityId !=null">
+                #{activityId} ,
+            </if>
+            <if test="productId !=null">
+                #{productId} ,
+            </if>
+            #{count},
+            now(),
+            0
+        </trim>
+    </insert>
+
+    <select id="getCartChateau" resultType="com.bgd.app.entity.VipCartChateauDto">
+        SELECT m.id as chateauId,m.logo as chateauLogo,m.`name` as chateauName,v.id as cartId
+        FROM vip_cart v
+        JOIN product_information i ON v.productid = i.id
+        JOIN mall_chateau m ON i.chateauid = m.id
+        WHERE v.datastatus = '0'
+        <if test="vipId != null and  vipId !=''">
+            and v.vipid = #{vipId}
+        </if>
+        order by v.id DESC
+        limit #{pageNo},#{pageSize}
+    </select>
+
+    <select id="queryProList" resultType="com.bgd.app.entity.CartProductDto">
+        SELECT i.id as productId,i.`name`,i.logo,i.discount,a.count,
+        m.activityid AS actId,i.capacity
+        FROM vip_cart a
+        LEFT JOIN product_information i ON a.productid = i.id
+        LEFT JOIN mall_activity_product m ON a.activityid = m.activityid
+        WHERE a.datastatus = '0' and a.id in
+        <foreach collection="array" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        order by a.id DESC
+    </select>
+
+    <update id="addCartProCount" parameterType="java.lang.Long">
+        UPDATE vip_cart
+          SET
+                count = count + 1,
+                updatetime = now()
+        WHERE datastatus = '0' and id = #{cartId} AND vipid = #{vipId}
+    </update>
+
+    <update id="subCartProCount" parameterType="java.lang.Long">
+        UPDATE vip_cart
+          SET
+                count = count - 1,
+                updatetime = now()
+        WHERE datastatus = '0' and id = #{cartId} AND vipid = #{vipId} and count > 1
+    </update>
+
+    <select id="getCartProCount" resultType="java.lang.Long">
+        SELECT count
+        FROM vip_cart
+        WHERE datastatus = '0' and id = #{cartId} AND vipid = #{vipId}
+        limit 1
+    </select>
+
+    <update id="batchDelCart">
+        UPDATE `vip_cart`
+        SET
+        `datastatus` = '1',
+        `updatetime` = now()
+        WHERE
+        id in
+        <foreach collection="array" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </update>
+
+    <select id="queryProResult" resultType="com.bgd.app.entity.CartProductDto">
+        SELECT
+            i.id AS productId,
+            i.`name`,
+            i.logo,
+            i.discount,
+            i.capacity
+        FROM
+            product_information i
+        WHERE
+            i.id = #{0}
+         LIMIT 1
+    </select>
+
+    <select id="getProListByCartIdArray" resultType="java.util.Map">
+        select productid as productId,count,activityid as actId
+        from vip_cart
+        where datastatus = '0' id in
+        <foreach collection="array" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <update id="updActProStock" parameterType="java.util.Map">
+        <foreach collection="list" item="item" index="index" separator=";" open="" close="">
+          update mall_activity_product
+          set remain = remain + #{item.count}
+          where activityid = #{item.actId} and productid = #{item.productId}
+      </foreach>
+    </update>
+</mapper>

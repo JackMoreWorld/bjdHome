@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.admin.dao.VipCouponsManagerDao">
+
+    <select id="findVipCoupons" resultType="com.bgd.admin.entity.VipCouponsManagerDto">
+        select t.id,t.type,t.price,t.status,t1.name chateauName
+        from vip_coupons t
+        left join mall_chateau t1 on t.chateauid = t1.id
+        where t.vipId = #{vipId}
+    </select>
+
+</mapper>

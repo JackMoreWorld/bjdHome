@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.app.dao.VipDao">
+
+
+    <select id="findVipByVip" parameterType="com.bgd.support.entity.VipInformationPo"
+            resultType="com.bgd.app.entity.VipInformationDto">
+        select t.id,t.name ,t.phone,t.Invitecode,
+        t.password,t.paypassword ,t.sex
+        from vip_information t
+        where 1=1
+        <if test="id!=null">
+            and t.id =#{id}
+        </if>
+        <if test="phone!=null">
+            and t.phone =#{phone}
+        </if>
+        <if test="password!=null">
+            and t.password =#{password}
+        </if>
+        <if test="inviteCode!=null">
+            and t.inviteCode =#{inviteCode}
+        </if>
+        limit 1
+    </select>
+
+    <insert id="saveVip"
+            parameterType="com.bgd.support.entity.VipInformationPo" useGeneratedKeys="true" keyProperty="id">
+        insert into vip_information
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name!=null">
+                name ,
+            </if>
+            <if test="logo!=null">
+                logo ,
+            </if>
+            <if test="password !=null">
+                password ,
+            </if>
+            <if test="phone!=null">
+                phone ,
+            </if>
+            <if test="openId!=null">
+                openid ,
+            </if>
+            <if test="payPassWord!=null">
+                paypassword ,
+            </if>
+            <if test="inviteCode!=null">
+                inviteCode,
+            </if>
+            <if test="regCode!=null">
+                regcode,
+            </if>
+            <if test="createTime!=null">
+                createtime,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name!=null">
+                #{name} ,
+            </if>
+            <if test="logo!=null">
+                #{logo} ,
+            </if>
+            <if test="password !=null">
+                #{password},
+            </if>
+            <if test="phone!=null">
+                #{phone},
+            </if>
+            <if test="openId!=null">
+                #{openId},
+            </if>
+            <if test="payPassWord!=null">
+                #{payPassWord},
+            </if>
+            <if test="inviteCode!=null">
+                #{inviteCode},
+            </if>
+            <if test="regCode!=null">
+                #{regCode},
+            </if>
+            <if test="createTime!=null">
+                #{createTime},
+            </if>
+        </trim>
+    </insert>
+
+    <insert id="saveVipMallInfo"
+            parameterType="com.bgd.support.entity.VipMallInfoPo">
+        insert into vip_mallinfo
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="vipId!=null">
+                vipId ,
+            </if>
+            <if test="levelId !=null">
+                levelid,
+            </if>
+            <if test="balance!=null">
+                balance ,
+            </if>
+            <if test="vipNo!=null">
+                vipno,
+            </if>
+            <if test="points!=null">
+                points,
+            </if>
+            <if test="createTime!=null">
+                createtime,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="vipId!=null">
+                #{vipId} ,
+            </if>
+            <if test="levelId !=null">
+                #{levelId},
+            </if>
+            <if test="balance!=null">
+                #{balance},
+            </if>
+            <if test="vipNo!=null">
+                #{vipNo},
+            </if>
+            <if test="points!=null">
+                #{points},
+            </if>
+            <if test="createTime!=null">
+                #{createTime},
+            </if>
+        </trim>
+    </insert>
+
+    <select id="findVipMallInfo" resultType="com.bgd.support.entity.VipMallInfoPo" parameterType="java.lang.Long">
+        select a.id,a.vipId,a.vipno,a.points,a.levelId,a.balance
+        from vip_mallinfo a
+        where a.vipid =#{vipId}
+        limit 1
+    </select>
+
+    <update id="updateVipMallInfo" parameterType="com.bgd.support.entity.VipMallInfoPo">
+        update vip_mallinfo
+        <set>
+            <if test="vipId != null">
+                vipId = #{vipId}
+            </if>
+            <if test="vipNo != null">
+                vipno = #{vipNo}
+            </if>
+            <if test="points != null">
+                points = #{points}
+            </if>
+            <if test="levelId != null">
+                levelId = #{levelId}
+            </if>
+            <if test="balance != null">
+                balance = #{balance}
+            </if>
+            <if test="updateTime != null ">
+                updateTime = #{updateTime}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="flushVip"
+            parameterType="com.bgd.app.entity.VipInformationDto">
+        update vip_information
+        <set>
+            <if test="name!=null">
+                name =#{name},
+            </if>
+            <if test="levelId !=null">
+                levelid =#{levelid},
+            </if>
+            <if test="password !=null">
+                password =#{password} ,
+            </if>
+            <if test="phone!=null">
+                phone =#{phone},
+            </if>
+            <if test="code!=null">
+                code =#{code},
+            </if>
+            <if test="openId!=null">
+                openid =#{openId} ,
+            </if>
+            <if test="payPassWord!=null">
+                paypassword =#{payPassWord},
+            </if>
+            <if test="balance!=null">
+                balance =#{balance},
+            </if>
+            <if test="inviteCode!=null">
+                inviteCode =#{inviteCode},
+            </if>
+            <if test="vipNo!=null">
+                vipno =#{vipNo},
+            </if>
+            <if test="points!=null">
+                points =#{points},
+            </if>
+            <if test="regCode!=null">
+                regcode =#{regCode},
+            </if>
+            <if test="createTime!=null">
+                createtime =#{createTime},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+
+    <insert id="saveOrUpdateFocus">
+        insert into vip_focus ( vipid, chateauid, createtime )
+        values ( #{0}, #{1},  now() )
+        on duplicate key update
+            vipid = #{0}, chateauid = #{1}, status = #{2}
+    </insert>
+
+    <insert id="saveOrUpdateCollect">
+        insert into vip_collection ( vipid,  productid,  createtime  )
+        values (  #{0}, #{1}, now()  )
+        on duplicate key update
+            vipid = #{0},  productid = #{1}, status = #{2}
+    </insert>
+
+    <insert id="saveFoot" parameterType="com.bgd.support.entity.VipFootMarkPo">
+        insert into vip_footmark ( vipid,  productid,  createtime  )
+        values ( #{0}, #{1}, now() )
+        on duplicate key update
+            vipid = #{0},  productid = #{1}
+    </insert>
+
+    <insert id="saveVipCoupons"
+            parameterType="com.bgd.support.entity.VipCouponsPo">
+        insert into vip_coupons
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="vipId!=null">
+                vipId ,
+            </if>
+            <if test="mallCouponsId !=null">
+                mallCouponsId,
+            </if>
+            <if test="type !=null">
+                type ,
+            </if>
+            <if test="chateauId!=null">
+                chateauId ,
+            </if>
+            <if test="levelId!=null">
+                levelId,
+            </if>
+            <if test="price!=null">
+                price ,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="vipId!=null">
+                #{vipId},
+            </if>
+            <if test="mallCouponsId !=null">
+                #{mallCouponsId},
+            </if>
+            <if test="type !=null">
+                #{type},
+            </if>
+            <if test="chateauId!=null">
+                #{chateauId},
+            </if>
+            <if test="levelId!=null">
+                #{levelId},
+            </if>
+            <if test="price!=null">
+                #{price},
+            </if>
+        </trim>
+    </insert>
+
+    <!--
+    <select id="callUpLevelByPointsP" parameterMap="map" parameterType="map">
+          call bgd.uplevel_by_points_p{
+              #{in_vipId,mode = IN,jdbcType = INTEGER},
+              #{in_points,mode = IN,jdbcType = INTEGER},
+              #{out_status,mode = OUT,jdbcType = INTEGER}
+          }
+    </select>
+    -->
+
+    <parameterMap id="map" type="java.util.Map">
+        <parameter property="vipId" jdbcType="BIGINT" javaType="java.lang.Long" mode="IN"></parameter>
+        <parameter property="points" jdbcType="BIGINT" javaType="java.lang.Long" mode="IN"></parameter>
+        <parameter property="status" jdbcType="BIGINT" javaType="java.lang.Long" mode="OUT"></parameter>
+    </parameterMap>
+
+
+    <select id="callUpLevelByPointsP" parameterMap="map" statementType="CALLABLE" resultType="map">
+          {
+            call bgd.uplevel_by_points_p(
+              #{vipId,mode = IN,jdbcType = BIGINT},
+              #{points,mode = IN,jdbcType = BIGINT},
+              #{status,mode = OUT,jdbcType = BIGINT}
+            )
+          }
+    </select>
+
+
+    <select id="findVipRecord" parameterType="com.bgd.support.entity.VipRecordPo"
+            resultType="com.bgd.support.entity.VipRecordPo">
+        select id, vipid, type, content, createtime from vip_record
+        where vipid=#{vipId} and type=#{type}  and recordDay=#{recordDay}
+    </select>
+
+    <insert id="saveVipRecord" parameterType="com.bgd.support.entity.VipRecordPo">
+          insert into vip_record(vipid,type,content,recordday)
+          values ( #{vipId},#{type},#{content}, #{recordDay} )
+    </insert>
+
+
+    <select id="findRewardOne" parameterType="com.bgd.support.entity.VipReward"
+            resultType="com.bgd.support.entity.VipReward">
+        select id, vipid, price, type, status, createtime from vip_reward a
+        where 1=1
+        <if test="vipId !=null">
+            and a.vipid=#{vipId}
+        </if>
+        <if test="type !=null">
+            and a.type=#{type}
+        </if>
+        <if test="status !=null">
+            and a.status=#{status}
+        </if>
+        limit 1
+    </select>
+
+    <insert id="saveVipReward" parameterType="com.bgd.support.entity.VipReward">
+        insert into vip_reward
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="vipId!=null">
+                vipId ,
+            </if>
+            <if test="price !=null">
+                price,
+            </if>
+            <if test="type !=null">
+                type ,
+            </if>
+            <if test="status!=null">
+                status ,
+            </if>
+            <if test="createTime!=null">
+                createTime,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="vipId!=null">
+                #{vipId} ,
+            </if>
+            <if test="price !=null">
+                #{price},
+            </if>
+            <if test="type !=null">
+                #{type },
+            </if>
+            <if test="status!=null">
+                #{status} ,
+            </if>
+            <if test="createTime!=null">
+                #{createTime},
+            </if>
+        </trim>
+    </insert>
+
+</mapper>

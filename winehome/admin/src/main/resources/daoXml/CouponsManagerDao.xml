@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.admin.dao.CouponsManagerDao">
+
+    <insert id="addCoupons" keyProperty="id" useGeneratedKeys="true">
+        insert into mall_coupons
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="type!=null">
+                type ,
+            </if>
+            <if test="chateauId!=null">
+                chateauId ,
+            </if>
+            <if test="levelId!=null">
+                levelId ,
+            </if>
+            <if test="price!=null">
+                price ,
+            </if>
+            <if test="dataStatus!=null">
+                dataStatus ,
+            </if>
+            <if test="createTime!=null">
+                createtime ,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="type!=null">
+                #{type} ,
+            </if>
+            <if test="chateauId!=null">
+                #{chateauId} ,
+            </if>
+            <if test="levelId!=null">
+                #{levelId} ,
+            </if>
+            <if test="price!=null">
+                #{price} ,
+            </if>
+            <if test="dataStatus!=null">
+                #{dataStatus} ,
+            </if>
+            <if test="createTime!=null">
+                #{createTime} ,
+            </if>
+        </trim>
+    </insert>
+
+    <delete id="deleteCoupons" parameterType="java.lang.Long">
+      delete from mall_coupons
+      where id = #{couponsId}
+    </delete>
+
+
+    <update id="updateCoupons">
+        update mall_coupons
+        <set>
+            <if test="type!=null">
+                type =#{type} ,
+            </if>
+            <if test="chateauId!=null">
+                chateauId =#{chateauId} ,
+            </if>
+            <if test="levelId!=null">
+                levelId =#{levelId} ,
+            </if>
+            <if test="price!=null">
+                price =#{price} ,
+            </if>
+            <if test="dataStatus!=null">
+                dataStatus =#{dataStatus} ,
+            </if>
+            <if test="updateTime!=null">
+                updatetime =#{updateTime} ,
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="countCoupons" resultType="java.lang.Long">
+        select count(a.id)
+        from mall_coupons a
+        left join mall_chateau b on a.chateauId = b.id
+        left join vip_level c on a.levelId = c.id
+        where 1=1
+        <if test="type != null">
+            and a.type = #{type}
+        </if>
+        <if test="chateauName !=null">
+            and b.name like concat('%',#{chateauName},'%')
+        </if>
+        <if test="levelName !=null">
+            and c.name like concat('%',#{levelName},'%')
+        </if>
+        <if test="price !=null">
+            and a.price=#{price}
+        </if>
+        <if test="dataStatus !=null">
+            and a.dataStatus=#{dataStatus}
+        </if>
+    </select>
+
+    <select id="findCoupons" resultType="com.bgd.admin.entity.CouponsManagerDto">
+        select a.id,a.type,a.chateauId,a.levelId,a.price,a.datastatus,b.name chateauName,c.name levelName
+        from mall_coupons a
+        left join mall_chateau b on a.chateauId = b.id
+        left join vip_level c on a.levelId = c.id
+        where 1=1
+        <if test="type != null">
+            and a.type = #{type}
+        </if>
+        <if test="chateauName !=null">
+            and b.name like concat('%',#{chateauName},'%')
+        </if>
+        <if test="levelName !=null">
+            and c.name like concat('%',#{levelName},'%')
+        </if>
+        <if test="price !=null">
+            and a.price=#{price}
+        </if>
+        <if test="dataStatus !=null">
+            and a.dataStatus=#{dataStatus}
+        </if>
+        limit #{pageNo},#{pageSize}
+    </select>
+
+</mapper>

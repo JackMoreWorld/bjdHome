@@ -1,0 +1,98 @@
+server:
+  port: 8082
+  servlet:
+    context-path: /api
+  tomcat:
+    uri-encoding: UTF-8
+    max-threads: 800
+    min-spare-threads: 30
+
+
+
+
+
+spring:
+  datasource:
+    url: jdbc:mysql://192.168.0.200:3306/bgd?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=UTC&allowMultiQueries=true
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    tomcat:
+      max-active: 20
+      initial-size: 5
+      max-wait: 60000
+      min-idle: 1
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      validation-query: select 'x'
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      connection-properties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+
+
+  redis:
+    host: 192.168.0.200
+    port: 6379
+
+
+  #整合消息队列
+  rabbitmq:
+    host: 192.168.0.200
+    port: 5672
+    username: admin
+    password: admin
+    #virtual-host: /
+    publisher-confirms: true
+    publisher-returns: true
+    listener:
+      direct:
+        acknowledge-mode: manual
+      simple:
+        acknowledge-mode: manual
+
+#mybaties配置
+mybatis:
+  mapper-locations: classpath*:/daoXml/**.xml
+  check-config-location: true
+  configuration:
+    map-underscore-to-camel-case: true
+
+
+
+wxconfig:
+  appDi: "wx8af7c56dfab25d3c"
+  appKey: "b7ab195d79b07cb00168db0484ecc1fd"
+  mchDi: '1529717081'
+  notifyUrl: "http://www.jiuzhijia.shop/api/notify/pay/wxPayNotifyRes.htm"
+  certRootPath: ''
+  spbillCreateIp: '47.111.161.18'
+  refundNotifyUrl: 'http://www.jiuzhijia.shop/api/notify/pay/wxRefundNotifyRes.htm'
+alipayconfig:
+  appid: 2019032763719399
+  rsa_private_key: MIIEowIBAAKCAQEAtcBl7jRxHHclMvO7xrRmUIzY7njl8CswnheMhayJVUNAUrZiX/46vK93RPsjwD5ITAdS22DIwySrvIB7ybFUKcklQyIyKbzkj3JTd+6NYcoH+L7Wvq3xj/dSUvdTEZgspBH/CK7eDZ6VfowNHcLq4zimaio6+juCH2fFLNPedDiH+daAXlhVdlLgxSy03mEu0shnTj9PlolreOiOu0UKwVZXyC0qDoIQBoX0+FJUsfJghqOa4jhMPzMzFv64kPqsQGAhqdaiNeHuAfjHNbpiNLO2WqjFxR00tDNX5oYQtXpKdXuzMILhaEwYjQxrIxb2yo4Z3FwHUOF8aiX3WBKA6wIDAQABAoIBAGsjvLKb1WXLUnFjvniXFY08ShDh0eIvA5zeEucl21sYps1bWEhwDF34LZ3LUbrcvC+dTZmmxxJKBra7Ir21vABZ445clSeHg1CQO2YCiPNxbhuTG/IRhcmxKKVhyGUhyIb7WNTciGeM6WFM29qEcYR6e5cvx86Ez+MFf/U5+/OT9KP3edQ/vvF3x19B3hhUHzdP9Ou0V84eSt/yGnkzNDpp0dLUHiSW2aPTKsLWCIABP53Y8Naf62mtN1Qlx35gFoMdy47dl3oFqmTtQm+nVkSLA17j532xDQ6PtxQfwBGFA5ym89SV6xyVllFgZ8WMD5kqAcYLWrQOAYhmot9QlakCgYEA5vgrxXnREWSaqsJPorNIDHO+2Br0pA2vLe//agQV1cTpahBUzfYQMGpWmcLrzKBEpCjfZ6mQNJWCFMy54KfryVhsLO2hhUVebmwC6TAMxDqGxDK4SGhsu3j+CxeGL8PhPKBmrldv9vHq4ayJkGfCBLFAOsa0+cHRkXzt/vkFI70CgYEAyXLEPJS43RloedHLBKYp0Op6DiOZNck1QTzHi2P6ZCmO2Q1z6NEhg0yOXNGdMOJtUo+bYGWShec/XKLUsWV5AoUBLz/C9qC8nZ6d6yLy4k2v3Y4T7OvS62hh3YgSL7KKOSAOh0eUEUv47zZK4TZ3PkghHeIZDLOJQDnx/jPxrccCgYALUP98BnLq4j39vdV/CD+wdH9WQUPZQd5iZs7h199mAObazoAJM1QpuxwRHo7FENksHeCMSK+LFAQylrFIw5F25QEv1ljCmdp9mIcv+620c5WkyUNkMNGbAduYmYd2kadYfBdr1VbkB4hVlEmNLLhB2JloB9JYJlnpQfC7PGI3FQKBgQDF5eb+FKRfIFzQf9bPpGUkBZUOWs5iVl3ozsrBFuCekWzxshOSPhCMKiMY8BtaMLZxCv76/g2pWfmXCaek9iig3wTA5ASlwFZLCc3ddyHgS61fG/pbH3i/JnYt6UTkcqLzZ5ieMSU2sMnGRjHdeWI/XyCZeMpe/ejxnXsr3N+pdQKBgCGO6rcbclGSQgWH41rwiP7MyIAI2I+pYrqyozCBl/usBVlTziDp34eVxMaBQa9/m9JLUPQi/eUaNowkJF4Jz7BLYhwQj0Bemcc/BR1QrdrGyf2Wz1+9N8z/in7WACUeLVwVX0Pfkx57B0YkXCgUZTJBU/SfLFx40IAp8ba9MAUR
+  notify_url: http://ly.chnssl.com:8090/api/alinotifyUrl
+  return_url: http://ly.chnssl.com:8090/alipay/returnUrl
+  url: https://openapi.alipay.com/gateway.do
+  charset: UTF-8
+  format: JSON
+  alipay_public_key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtcBl7jRxHHclMvO7xrRmUIzY7njl8CswnheMhayJVUNAUrZiX/46vK93RPsjwD5ITAdS22DIwySrvIB7ybFUKcklQyIyKbzkj3JTd+6NYcoH+L7Wvq3xj/dSUvdTEZgspBH/CK7eDZ6VfowNHcLq4zimaio6+juCH2fFLNPedDiH+daAXlhVdlLgxSy03mEu0shnTj9PlolreOiOu0UKwVZXyC0qDoIQBoX0+FJUsfJghqOa4jhMPzMzFv64kPqsQGAhqdaiNeHuAfjHNbpiNLO2WqjFxR00tDNX5oYQtXpKdXuzMILhaEwYjQxrIxb2yo4Z3FwHUOF8aiX3WBKA6wIDAQAB
+  signtype: RSA2
+
+
+
+
+global:
+  truePath : '/home/file/'
+  nginxPath : '192.168.0.200/static/'
+  defaultImg: 'http://192.168.0.105:8088/static/PIC//2019032719214563905357.png'
+  corePoolSize: 100
+
+
+logging:
+  path: ./log
+  level:
+    com.bgd.app:  debug
+
+
+

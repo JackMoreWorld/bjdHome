@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.admin.dao.PushManagerDao">
+
+    <insert id="addPush" keyProperty="id" useGeneratedKeys="true">
+        insert  into mall_push
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="type!=null">
+                type ,
+            </if>
+            <if test="pushId!=null">
+                pushId ,
+            </if>
+            <if test="img!=null">
+                img ,
+            </if>
+            <if test="createTime!=null">
+                createtime ,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="type!=null">
+                #{type} ,
+            </if>
+            <if test="pushId!=null">
+                #{pushId} ,
+            </if>
+            <if test="img!=null">
+                #{img} ,
+            </if>
+            <if test="createTime!=null">
+                #{createTime} ,
+            </if>
+        </trim>
+    </insert>
+
+    <delete id="deletePush">
+      delete from mall_push
+      where  type = #{type}
+    </delete>
+
+    <select id="findPushManager" resultType="com.bgd.admin.entity.PushManagerDto">
+        select a.id,a.type,a.pushid,a.img
+        from mall_push a
+        where 1=1
+        <if test="type != null">
+            and a.type = #{type}
+        </if>
+    </select>
+
+    <select id="findPushCountry" resultType="com.bgd.admin.entity.CountryManagerDto">
+        select t.id,t.name,t.logo,t.phrase,t.remark
+        from mall_country t
+        inner join mall_push t1 on t.id = t1.pushid
+        where t1.type = 1
+    </select>
+
+    <select id="findPushChateau" resultType="com.bgd.admin.entity.ChateauManagerDto">
+        select a.id,a.name,a.logo,a.categoryid,a.video,a.countryid,a.status,b.name categoryname,c.name countryname
+        from mall_chateau a
+        left join product_category b on a.categoryid = b.id
+        left join mall_country c on a.countryid = c.id
+        inner join mall_push t1 on a.id = t1.pushid
+        where t1.type = 2
+    </select>
+
+    <select id="findPushProduct" resultType="com.bgd.admin.entity.ProductManagerDto">
+        select a.id,a.name,a.logo,a.countryId,a.categoryId,a.chateauId,a.flavor,
+        a.alcohol,a.specifications,a.discount,a.remark,a.createtime,
+        b.name countryName,c.name categoryName,d.name chateauName
+        from product_information a
+        left join mall_country b on a.countryId = b.id
+        left join product_category c on a.categoryId = c.id
+        left join mall_chateau d on a.chateauId = d.id
+        inner join mall_push t1 on a.id = t1.pushid
+        where t1.type = 3
+    </select>
+
+    <select id="findActivity" resultType="com.bgd.admin.entity.ActivityManagerDto">
+        select a.id,a.name,a.title,a.img,a.status,a.type
+        from mall_activity a
+        inner join mall_push t1 on a.id = t1.pushid
+        where t1.type = 4
+    </select>
+
+</mapper>

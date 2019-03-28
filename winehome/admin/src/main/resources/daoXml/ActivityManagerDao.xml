@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.admin.dao.ActivityManagerDao">
+
+    <insert id="addActivity" useGeneratedKeys="true" keyProperty="id">
+        insert into mall_activity
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">
+                name ,
+            </if>
+            <if test="title != null">
+                title ,
+            </if>
+            <if test="img != null">
+                img ,
+            </if>
+            <if test="status != null">
+                status ,
+            </if>
+            <if test="type != null">
+                type ,
+            </if>
+            <if test="createTime!=null">
+                createtime ,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name!=null">
+                #{name} ,
+            </if>
+            <if test="title!=null">
+                #{title} ,
+            </if>
+            <if test="img!=null">
+                #{img} ,
+            </if>
+            <if test="status!=null">
+                #{status} ,
+            </if>
+            <if test="type!=null">
+                #{type} ,
+            </if>
+            <if test="createTime!=null">
+                #{createTime} ,
+            </if>
+        </trim>
+    </insert>
+
+    <delete id="deleteActivity" parameterType="java.lang.Long">
+      delete from mall_activity
+      where id = #{activityId}
+    </delete>
+
+
+    <update id="updateActivity">
+        update mall_activity
+          <set>
+              <if test="name!= null">
+                  name = #{name} ,
+              </if>
+              <if test="title!= null">
+                  title = #{title} ,
+              </if>
+              <if test="img!= null">
+                  img = #{img} ,
+              </if>
+              <if test="status!= null">
+                  status = #{status} ,
+              </if>
+              <if test="type!= null">
+                  type = #{type} ,
+              </if>
+              <if test="updateTime!=null">
+                  updateTime =#{updateTime} ,
+              </if>
+          </set>
+        where id = #{id}
+    </update>
+
+    <select id="countActivity" resultType="java.lang.Long">
+        select count(a.id)
+        from mall_activity a
+        where 1=1
+        <if test = "name != null">
+            and a.name = #{name}
+        </if>
+        <if test = "type != null">
+            and a.type = #{type}
+        </if>
+        <if test = "title != null">
+            and a.title = #{title}
+        </if>
+        <if test="status !=null">
+            and a.status=#{status}
+        </if>
+    </select>
+
+    <select id="findActivity" resultType="com.bgd.admin.entity.ActivityManagerDto">
+        select a.id,a.name,a.title,a.img,a.status,a.type
+        from mall_activity a
+        where 1=1
+        <if test = "name != null">
+            and a.name = #{name}
+        </if>
+        <if test = "type != null">
+            and a.type = #{type}
+        </if>
+        <if test = "title != null">
+            and a.title = #{title}
+        </if>
+        <if test="status !=null">
+            and a.status=#{status}
+        </if>
+        limit #{pageNo},#{pageSize}
+    </select>
+
+</mapper>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.admin.dao.ProImgManagerDao">
+
+    <insert id="addProImg" parameterType="com.bgd.admin.entity.ProImgManagerDto">
+        INSERT INTO `product_img` (
+        `productid`,
+        `type`,
+        `img`,
+        `sort`,
+        `createtime`
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.productId},
+            #{item.type},
+            #{item.img},
+            #{item.sort},
+            now()
+            )
+        </foreach>
+    </insert>
+
+    <delete id="deleteProImg" parameterType="java.lang.Long">
+        delete product_img
+        where productid = #{productId}
+    </delete>
+
+    <select id="findProImg" parameterType="java.lang.Long" resultType="com.bgd.admin.entity.ProImgManagerDto">
+        select id,productid,type,img,sort
+        from product_img
+        where productid = #{productId}
+    </select>
+
+</mapper>

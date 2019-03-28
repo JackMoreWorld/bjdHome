@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.admin.dao.ActProManagerDao">
+
+    <insert id="addActivityPro" useGeneratedKeys="true" keyProperty="id">
+        insert into mall_activity_product
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="activityId != null">
+                activityId ,
+            </if>
+            <if test="productId != null">
+                productId ,
+            </if>
+            <if test="categoryId != null">
+                categoryId ,
+            </if>
+            <if test="newCapacity != null">
+                newCapacity ,
+            </if>
+            <if test="remain != null">
+                remain ,
+            </if>
+            <if test="img != null">
+                img ,
+            </if>
+            <if test="actDay != null">
+                actDay ,
+            </if>
+            <if test="startTime != null">
+                startTime ,
+            </if>
+            <if test="endTime != null">
+                endTime ,
+            </if>
+            <if test="total != null">
+                total ,
+            </if>
+            <if test="like != null">
+                `like` ,
+            </if>
+            <if test="createTime!=null">
+                createTime ,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="activityId!=null">
+                #{activityId} ,
+            </if>
+            <if test="productId!=null">
+                #{productId} ,
+            </if>
+            <if test="categoryId!=null">
+                #{categoryId} ,
+            </if>
+            <if test="newCapacity!=null">
+                #{newCapacity} ,
+            </if>
+            <if test="remain!=null">
+                #{remain} ,
+            </if>
+            <if test="img!=null">
+                #{img} ,
+            </if>
+            <if test="actDay!=null">
+                #{actDay} ,
+            </if>
+            <if test="startTime!=null">
+                #{startTime} ,
+            </if>
+            <if test="endTime!=null">
+                #{endTime} ,
+            </if>
+            <if test="total!=null">
+                #{total} ,
+            </if>
+            <if test="like!=null">
+                #{like} ,
+            </if>
+            <if test="createTime!=null">
+                #{createTime} ,
+            </if>
+        </trim>
+    </insert>
+
+    <delete id="deleteActivityPro" parameterType="java.lang.Long">
+      delete from mall_activity_product
+      where id = #{activityProId}
+    </delete>
+
+    <update id="updateActivityPro"
+            parameterType="com.bgd.admin.entity.ActivityProManagerDto">
+        update mall_activity_product
+        <set>
+            <if test="activityId!= null">
+                activityid = #{activityId} ,
+            </if>
+            <if test="productId!= null">
+                productId = #{productId} ,
+            </if>
+            <if test="categoryId!= null">
+                categoryId = #{categoryId} ,
+            </if>
+            <if test="newCapacity!= null">
+                newCapacity = #{newCapacity} ,
+            </if>
+            <if test="img!= null">
+                img = #{img} ,
+            </if>
+            <if test="actDay!= null">
+                actDay = #{actDay} ,
+            </if>
+            <if test="startTime!= null">
+                startTime = #{startTime} ,
+            </if>
+            <if test="endTime!= null">
+                endTime = #{endTime} ,
+            </if>
+            <if test="total!= null">
+                total = #{total} ,
+            </if>
+            <if test="like!= null">
+                `like` = #{like} ,
+            </if>
+            <if test="updateTime!=null">
+                updateTime =#{updateTime} ,
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="countActivityPro" resultType="java.lang.Long">
+        select count (a.id)
+        from mall_activity_product a
+        left join mall_activity b on a.activityId = b.id
+        left join product_information c on a.productId = c.id
+        where 1=1
+        <if test = "activityName != null">
+            and b.name like concat ('%',#{activityName},'%')
+        </if>
+        <if test = "productName != null">
+            and c.name like concat ('%',#{productName},'%')
+        </if>
+    </select>
+
+    <select id="findActivityPro" resultType="com.bgd.admin.entity.ActivityProManagerDto">
+        select a.id,a.activityId,a.productId,,a.total,a.`like`,
+        b.name activityName,c.name productName
+        from mall_activity_product a
+        left join mall_activity b on a.activityId = b.id
+        left join product_information c on a.productId = c.id
+        where 1=1
+        <if test = "activityName != null">
+            and b.name like concat ('%',#{activityName},'%')
+        </if>
+        <if test = "productName != null">
+            and c.name like concat ('%',#{productName},'%')
+        </if>
+        limit #{pageNo},#{pageSize}
+    </select>
+
+</mapper>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.admin.dao.AdvManagerProDao">
+
+    <insert id="addAdvertisingPro" useGeneratedKeys="true" keyProperty="id">
+        insert into mall_ad_product
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="adId!=null">
+                adId ,
+            </if>
+            <if test="productId!=null">
+                productId ,
+            </if>
+            <if test="newPrice!=null">
+                newPrice ,
+            </if>
+            <if test="createTime!=null">
+                createtime ,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="adId!=null">
+                #{adId} ,
+            </if>
+            <if test="productId!=null">
+                #{productId} ,
+            </if>
+            <if test="newPrice!=null">
+                #{newPrice} ,
+            </if>
+            <if test="createTime!=null">
+                #{createTime} ,
+            </if>
+        </trim>
+    </insert>
+
+    <delete id="deleteAdvertisingPro" parameterType="java.lang.Long">
+      delete from mall_ad_product
+      where id = #{advertisingProId}
+    </delete>
+
+
+    <update id="updateAdvertisingPro">
+        update mall_ad_product
+        <set>
+            <if test="adId!=null">
+                adId =#{adId} ,
+            </if>
+            <if test="productId!=null">
+                productId =#{productId} ,
+            </if>
+            <if test="newPrice!=null">
+                newPrice =#{newPrice} ,
+            </if>
+            <if test="updateTime!=null">
+                updateTime =#{updateTime} ,
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="countAdvertising" resultType="java.lang.Long">
+        select count(a.id)
+        from mall_ad_product a
+        left join mall_ad b on a.adId = b.id
+        left join product_information c on a.productId = c.id
+        where 1=1
+        <if test="advertisingName !=null">
+            and b.name like concat('%',#{advertisingName},'%')
+        </if>
+        <if test="productName != null">
+            and c.name like concat('%',#{productName},'%')
+        </if>
+    </select>
+
+    <select id="findAdvertisingPro" resultType="com.bgd.admin.entity.AdvProManagerDto">
+        select a.id,a.adId,a.productId,a.newcapacity,b.name advertisingName,c.name productName
+        from mall_ad_product a
+        left join mall_ad b on a.adId = b.id
+        left join product_information c on a.productId = c.id
+        where 1=1
+        <if test="advertisingName !=null">
+            and b.name like concat('%',#{advertisingName},'%')
+        </if>
+        <if test="productName != null">
+            and c.name like concat('%',#{productName},'%')
+        </if>
+        limit #{pageNo},#{pageSize}
+    </select>
+
+</mapper>

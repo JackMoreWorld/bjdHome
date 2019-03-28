@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.bgd.app.dao.CommunityDao">
+
+    <select id="findFocusById" parameterType="java.lang.Long" resultType="com.bgd.support.entity.CommunityFocusPo">
+        select id, vipid, focus from  community_focus
+        where vipid=#{vipId}
+    </select>
+
+
+    <update id="updateFocus" parameterType="com.bgd.support.entity.CommunityFocusPo">
+        update community_focus
+        set focus =#{focus}
+        where vipid=#{vipId}
+    </update>
+
+    <insert id="saveFocus" parameterType="com.bgd.support.entity.CommunityFocusPo">
+      insert into community_focus(vipid, focus, createtime)
+      values (#{vipId},#{focus},now())
+    </insert>
+
+    <select id="countAllArticle" resultType="java.lang.Long" parameterType="com.bgd.app.entity.param.CommunityParam">
+        select count(id) from community_article where 1=1
+        <if test="vipId !=null">
+            and vipId=#{vipId}
+        </if>
+        <if test="type !=null">
+            and type=#{type}
+        </if>
+        <if test="pid !=null">
+            and pid=#{pid}
+        </if>
+    </select>
+
+    <select id="pageAllArticle" resultType="com.bgd.app.entity.CommunityArticleDto"
+            parameterType="com.bgd.app.entity.param.CommunityParam">
+        select a.id,a.title,a.like,
+        a.img1,a.img2,a.img3,a.img4,a.img5,a.content,
+        b.name vipName,b.logo vipLogo,a.createtime,count(s.id) commentcount
+        from community_article a
+        LEFT JOIN community_article AS s ON s.pid = a.id
+        left join vip_information b on a.vipid=b.id
+        where 1=1
+        <if test="vipId !=null">
+            and vipId=#{vipId}
+        </if>
+        <if test="type !=null">
+            and a.type=#{type}
+        </if>
+        <if test="pid !=null">
+            and a.pid=#{pid}
+        </if>
+        GROUP BY a.id
+        order by a.createtime desc
+        limit #{pageNo},#{pageSize}
+    </select>
+
+
+    <select id="countFocusArticle" resultType="java.lang.Long" parameterType="com.bgd.app.entity.param.CommunityParam">
+        select count(id) from community_article
+        where type in (${typeStr})
+        and vipid in
+        <foreach collection="focus" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="pageFocusArticle" resultType="com.bgd.app.entity.CommunityArticleDto"
+            parameterType="com.bgd.app.entity.param.CommunityParam">
+        select a.id,a.title,a.like,
+        a.img1,a.img2,a.img3,a.img4,a.img5,a.content,
+        b.name vipName,b.logo vipLogo,a.createtime,count(s.id) commentcount
+        from community_article a
+        LEFT JOIN community_article AS s ON s.pid = a.id
+        left join vip_information b on a.vipid=b.id
+        where a.type in (${typeStr})
+        and a.vipid in
+        <foreach collection="focus" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+        GROUP BY a.id
+        order by a.createtime desc
+        limit #{pageNo},#{pageSize}
+    </select>
+
+
+    <select id="findArticleOne" resultType="com.bgd.app.entity.CommunityArticleDto" parameterType="java.lang.Long">
+        select a.id,a.title,a.like,a.vipid,
+        a.img1,a.img2,a.img3,a.img4,a.img5,a.content,
+        b.name vipName,b.logo vipLogo,a.createtime,count(s.id) commentcount
+        from community_article a
+        LEFT JOIN community_article AS s ON s.pid = a.id
+        left join vip_information  b  on a.vipid=b.id
+        where a.id=#{id}
+         GROUP BY a.id
+        limit 1
+    </select>
+
+
+    <insert id="saveArticle" parameterType="com.bgd.support.entity.CommunityArticlePo">
+        insert into community_article
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="pid!=null">
+                pid ,
+            </if>
+            <if test="no!=null">
+                no ,
+            </if>
+            <if test="vipId!=null">
+                vipId ,
+            </if>
+            <if test="title!=null">
+                title ,
+            </if>
+            <if test="content!=null">
+                content ,
+            </if>
+            <if test="img1!=null">
+                img1 ,
+            </if>
+            <if test="img2!=null">
+                img2 ,
+            </if>
+            <if test="img3!=null">
+                img3 ,
+            </if>
+            <if test="no!=null">
+                img4 ,
+            </if>
+            <if test="img5!=null">
+                img5 ,
+            </if>
+            <if test="type!=null">
+                type ,
+            </if>
+            <if test="createTime!=null">
+                createtime ,
+            </if>
+            <if test="like!=null">
+                like ,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="pid!=null">
+                #{pid} ,
+            </if>
+            <if test="no!=null">
+                #{no} ,
+            </if>
+            <if test="vipId!=null">
+                #{vipId} ,
+            </if>
+            <if test="title!=null">
+                #{title} ,
+            </if>
+            <if test="content!=null">
+                #{content} ,
+            </if>
+            <if test="img1!=null">
+                #{img1} ,
+            </if>
+            <if test="img2!=null">
+                #{img2} ,
+            </if>
+            <if test="img3!=null">
+                #{img3} ,
+            </if>
+            <if test="img4!=null">
+                #{img4} ,
+            </if>
+            <if test="img5!=null">
+                #{img5} ,
+            </if>
+            <if test="type!=null">
+                #{type} ,
+            </if>
+            <if test="createTime!=null">
+                #{createTime} ,
+            </if>
+            <if test="like!=null">
+                #{like} ,
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateCommunity" parameterType="map">
+        update community_article a
+        <if test="type == 1">
+            set a.like =a.like + 1
+            where a.id =#{id} and a.like>=0
+        </if>
+        <if test="type == -1">
+            set a.like =a.like - 1
+            where a.id =#{id} and a.like>=1
+        </if>
+    </update>
+
+
+    <select id="pageMyFocus" resultType="com.bgd.app.entity.CommunityFocusDto"
+            parameterType="java.util.List">
+        select a.id vipId, a.name vipName,a.logo vipLogo from vip_information a
+        where a.id in
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+</mapper>
